@@ -25,16 +25,10 @@ $policyPrefix = "[CK-import] "
 # connect to Graph
 Connect-MgGraph -Scopes "DeviceManagementConfiguration.ReadWrite.All" -NoWelcome
 
-<#
 # Resolve repo root (script is in src/, manifest is at repo root)
-$scriptDir = $PSScriptRoot
-if (-not $scriptDir) { $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
-$repoRoot = (Resolve-Path (Join-Path $scriptDir '..')).Path
-$manifestPath = Join-Path $repoRoot 'manifest.json'
-#>
-
-# set repo directory
-$repoRoot = "C:\temp\intune-my-macs"
+$repoRoot = $PSScriptRoot
+if (-not $repoRoot) { $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path -ErrorAction Continue}
+if (-not $repoRoot) { $repoRoot = "C:\temp\intune-my-macs"}
 
 # set manifest path
 $manifestPath = Join-Path $repoRoot 'manifest.json'
