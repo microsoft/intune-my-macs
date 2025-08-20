@@ -45,7 +45,7 @@
       "primaryBundleId": "com.microsoft.onboarding",
       "primaryBundleVersion": "1.0",
       "publisher": "Microsoft",
-      "minimumSupportedOperatingSystem": "v10_13",
+      "minimumSupportedOperatingSystem": "v13_0",
       "ignoreVersionDetection": "true"
     },
     {

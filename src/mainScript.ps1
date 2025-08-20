@@ -655,9 +655,24 @@ if ($importPackages) {
             }
         )
 
+        # add preinstall script if needed
+        if ($a.preinstallscript) {
+            $preinstallScript = Get-Content -Path $a.preinstallscript -Raw
+        } else {
+            $preinstallScript = $null
+        }
+
+        # add postInstall script if needed
+        if ($a.postInstallScript) {
+            $postInstallScript = Get-Content -Path $a.postInstallScript -Raw
+        } else {
+            $postInstallScript = $null
+        }
+
         Invoke-macOSLobAppUpload -SourceFile "c:\temp\Microsoft_Remote_Help_1.0.2501211_installer.pkg" `
         -displayName "$($displayName)" -Publisher "$($a.publisher)" -Description "$($desc)" `
         -primaryBundleId "$($a.primaryBundleId)" -primaryBundleVersion "$($a.primaryBundleVersion)" `
+        -preInstallScriptPath $preinstallScript -postInstallScriptPath $postInstallScript `
         -includedApps $includedApps -minimumSupportedOperatingSystem $minimumSupportedOperatingSystem `
         -ignoreVersionDetection $ignoreVersionDetection -ChunkSizeMB 8
     }
