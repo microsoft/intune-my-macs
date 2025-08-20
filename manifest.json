@@ -39,7 +39,14 @@
       "description": "Installs the Swift Dialog onboarding splash screen used during first-run onboarding and auto installs Office, Edge, Windows App.",
       "platform": "macOS",
       "category": "Config",
-      "filePath": "onboarding/IMM-Swift Dialog Onboarding.pkg"
+      "filePath": "onboarding/IMM-Swift Dialog Onboarding.pkg",
+      "preinstallscript": "",
+      "postInstallScript": "",
+      "primaryBundleId": "com.microsoft.onboarding",
+      "primaryBundleVersion": "1.0",
+      "publisher": "Microsoft",
+      "minimumSupportedOperatingSystem": "v10_13",
+      "ignoreVersionDetection": "true"
     },
     {
       "type": "Script",
