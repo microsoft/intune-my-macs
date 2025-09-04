@@ -2,7 +2,7 @@
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#deviceManagement/configurationPolicies/$entity",
     "creationSource": null,
     "description": "Configures FileVault disk encryption on macOS devices during Setup Assistant with recovery key escrow to Microsoft Endpoint Manager for enterprise data protection.",
-    "name": "IMM - FileVault Setup",
+    "name": "FileVault Encryption",
     "platforms": "macOS",
     "priorityMetaData": null,
     "roleScopeTagIds": [

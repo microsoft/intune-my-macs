@@ -2,7 +2,7 @@
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#deviceManagement/configurationPolicies/$entity",
     "creationSource": null,
     "description": "Enforces passcode requirements for macOS devices including minimum length, complexity, failed attempt limits, and expiration policies to ensure device security compliance.",
-    "name": "IMM - Passcode (DDM)",
+    "name": "DDM Passcode",
     "platforms": "macOS",
     "priorityMetaData": null,
     "roleScopeTagIds": [

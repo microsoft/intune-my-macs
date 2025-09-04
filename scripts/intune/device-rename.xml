@@ -1,0 +1,14 @@
+<MacIntuneManifest>
+  <Type>Script</Type>
+  <Name>Rename Device</Name>
+  <Description>Renames the Mac based on country code and serial number.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>scripts/intune/device-rename.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

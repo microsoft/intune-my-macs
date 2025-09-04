@@ -1,0 +1,19 @@
+<MacIntuneManifest>
+  <Type>Package</Type>
+  <Name>Mac Evaluation Utility</Name>
+  <Description>Installs the Mac Evaluation Utility for assessment and troubleshooting on managed macOS devices.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>apps/MacEvaluationUtility.pkg</SourceFile>
+  <Package>
+  <DisplayName>Mac Evaluation Utility</DisplayName>
+    <FileName>MacEvaluationUtility.pkg</FileName>
+    <PreInstallScript></PreInstallScript>
+    <PostInstallScript></PostInstallScript>
+    <PrimaryBundleId>com.microsoft.maceval</PrimaryBundleId>
+    <PrimaryBundleVersion>1.0.0</PrimaryBundleVersion>
+    <Publisher>Apple</Publisher>
+    <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
+    <IgnoreVersionDetection>true</IgnoreVersionDetection>
+  </Package>
+</MacIntuneManifest>

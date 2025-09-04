@@ -1,0 +1,14 @@
+<MacIntuneManifest>
+  <Type>Script</Type>
+  <Name>Escrow Buddy Install</Name>
+  <Description>Install latest Escrow Buddy and remediate missing FileVault escrow.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>scripts/intune/install-escrow-buddy.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

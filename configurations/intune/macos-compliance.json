@@ -1,0 +1,28 @@
+{
+  "@odata.type": "#microsoft.graph.macOSCompliancePolicy",
+  "displayName": "PLACEHOLDER",  
+  "description": "Baseline macOS compliance policy requiring FileVault encryption, Firewall enabled, Gatekeeper (App Store + Identified developers), SIP enabled, and minimum macOS 13.0.",
+  "passwordRequired": false,
+  "storageRequireEncryption": true,
+  "deviceThreatProtectionEnabled": false,
+  "deviceThreatProtectionRequiredSecurityLevel": "unavailable",
+  "firewallEnabled": true,
+  "firewallBlockAllIncoming": false,
+  "firewallEnableStealthMode": true,
+  "gatekeeperAllowedAppSource": "macAppStoreAndIdentifiedDevelopers",
+  "systemIntegrityProtectionEnabled": true,
+  "osMinimumVersion": "15.0",
+  "managedEmailProfileRequired": false,
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "default",
+      "scheduledActionConfigurations": [
+        {
+          "actionType": "block",
+          "gracePeriodHours": 0,
+          "notificationTemplateId": null
+        }
+      ]
+    }
+  ]
+}

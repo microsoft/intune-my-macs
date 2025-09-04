@@ -1,0 +1,14 @@
+<MacIntuneManifest>
+  <Type>Script</Type>
+  <Name>Company Portal Install</Name>
+  <Description>Install Microsoft Company Portal via signed PKG; ensures MAU and Rosetta.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>scripts/intune/install-company-portal.zsh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

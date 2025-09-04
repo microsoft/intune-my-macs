@@ -1,0 +1,15 @@
+<MacIntuneManifest>
+  <Type>Package</Type>
+  <Name>Onboarding Splashscreen</Name>
+  <Description>Installs Swift Dialog onboarding splash screen and triggers core app installs.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>apps/IMM-Swift Dialog Onboarding.pkg</SourceFile>
+  <Package>
+    <PrimaryBundleId>com.microsoft.onboarding</PrimaryBundleId>
+    <PrimaryBundleVersion>1.0</PrimaryBundleVersion>
+    <Publisher>Microsoft</Publisher>
+    <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
+    <IgnoreVersionDetection>true</IgnoreVersionDetection>
+  </Package>
+</MacIntuneManifest>

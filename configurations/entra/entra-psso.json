@@ -2,7 +2,7 @@
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#deviceManagement/configurationPolicies/$entity",
     "creationSource": null,
     "description": "Configures Platform Single Sign-On (SSO) for Microsoft Entra ID authentication on macOS devices, enabling seamless authentication across Microsoft services and applications.",
-    "name": "IMM - Platform SSO",
+    "name": "Entra Platform SSO",
     "platforms": "macOS",
     "priorityMetaData": null,
     "roleScopeTagIds": [
