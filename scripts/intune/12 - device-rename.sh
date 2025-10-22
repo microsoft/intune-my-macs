@@ -28,13 +28,13 @@ ABMOnly="false"
 EnforceBYOD="false"
 
 ## Check if the log directory has been created
-if [ -d $logandmetadir ]; then
+if [ -d "$logandmetadir" ]; then
     ## Already created
     echo "# $(date) | Log directory already exists - $logandmetadir"
 else
     ## Creating Metadirectory
     echo "# $(date) | creating log directory - $logandmetadir"
-    mkdir -p $logandmetadir
+    mkdir -p "$logandmetadir"
     firstrun="true"
 fi
 
@@ -70,7 +70,7 @@ fi
 
 
 echo " $(date) | Old Name: $CurrentNameCheck"
-ModelName=$(system_profiler SPHardwareDataType | awk /'Model Name: '/ | cut -d ':' -f2- | xargs)
+ModelName=$(system_profiler SPHardwareDataType | awk '/Model Name:/ {print}' | cut -d ':' -f2- | xargs)
 if [ "$?" = "0" ]; then
   echo " $(date) | Retrieved model name: $ModelName"
 else
@@ -100,21 +100,21 @@ fi
 ## What is our public IP
 echo " $(date) | Looking up public IP"
 myip=$(dig +short myip.opendns.com @resolver1.opendns.com)
-Country=$(curl -s 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.69' https://ipapi.co/$myip/country)
+Country=$(curl -s -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.69' https://ipapi.co/$myip/country)
 
 
 echo " $(date) | Generating four characters code based on retrieved model name $ModelName"
 
-case $ModelName in
-  MacBook\ Air*) ModelCode=MBA;;
-  MacBook\ Pro*) ModelCode=MBP;;
-  MacBook*) ModelCode=MB;;
-  iMac*) ModelCode=IMAC;;
-  Mac\ Pro*) ModelCode=PRO;;
-  Mac\ mini*) ModelCode=MINI;;
-  Mac\ Studio*) ModelCode=MS;;
-  Apple\ Virtual\ Machine*) ModelCode=VM;;
-  *) ModelCode=$(echo $ModelName | tr -d ' ' | cut -c1-4);;
+case "$ModelName" in
+  "MacBook Air"*) ModelCode="MBA";;
+  "MacBook Pro"*) ModelCode="MBP";;
+  "MacBook"*) ModelCode="MB";;
+  "iMac"*) ModelCode="IMAC";;
+  "Mac Pro"*) ModelCode="PRO";;
+  "Mac mini"*) ModelCode="MINI";;
+  "Mac Studio"*) ModelCode="MS";;
+  "Apple Virtual Machine"*) ModelCode="VM";;
+  *) ModelCode=$(echo "$ModelName" | tr -d ' ' | cut -c1-4);;
 esac
 
 echo " $(date) | OwnerPrefix variable set to $OwnerPrefix"
@@ -161,7 +161,7 @@ if [[ "$CurrentNameCheck" == "$NewName" ]]
 fi
 
 #Setting ComputerName
-scutil --set ComputerName $NewName
+scutil --set ComputerName "$NewName"
 if [ "$?" = "0" ]; then
    echo " $(date) | Computername changed from $CurrentNameCheck to $NewName"
 else
@@ -170,7 +170,7 @@ else
 fi
 
 #Setting HostName
-scutil --set HostName $NewName
+scutil --set HostName "$NewName"
 if [ "$?" = "0" ]; then
    echo " $(date) | HostName changed from $CurrentNameCheck to $NewName"
 else
@@ -179,7 +179,7 @@ else
 fi
 
 #Setting LocalHostName
-scutil --set LocalHostName $NewName
+scutil --set LocalHostName "$NewName"
 if [ "$?" = "0" ]; then
    echo " $(date) | LocalHostName changed from $CurrentNameCheck to $NewName"
 else
