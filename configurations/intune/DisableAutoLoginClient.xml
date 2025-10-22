@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-	<Type>CustomConfig</Type>
-	<Name>Disable Auto Login Client</Name>
-	<Description>Disables automatic login on macOS devices by configuring the login window to require explicit user authentication. This security control ensures that devices cannot automatically log in users without credentials, maintaining proper access control and accountability on managed endpoints.</Description>
-	<Platform>macOS</Platform>
-	<Category>Security</Category>
-	<SourceFile>configurations/intune/DisableAutoLoginClient.mobileconfig</SourceFile>
-</MacIntuneManifest>

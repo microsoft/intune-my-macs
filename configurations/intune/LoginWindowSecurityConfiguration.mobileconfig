@@ -11,6 +11,8 @@
 			<true/>
 			<key>EnableExternalAccounts</key>
 			<false/>
+			<key>com.apple.login.mcx.DisableAutoLoginClient</key>
+			<true/>
 			<key>PayloadDisplayName</key>
 			<string>Login Window</string>
 			<key>PayloadIdentifier</key>
