@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+    <Type>Policy</Type>
+    <Name>Software Update Policy</Name>
+    <Description>Manages macOS software updates with automatic installation at 1:00 AM (3-day delay for latest updates), enables standard user OS updates, automatic download/install of OS and security updates, enables notifications and Rapid Security Response (RSR) updates for immediate threat mitigation.</Description>
+    <Platform>macOS</Platform>
+    <Category>Software Updates</Category>
+    <SourceFile>configurations/intune/Software Update Policy.json</SourceFile>
+    <SettingsCount>2</SettingsCount>
+</MacIntuneManifest>

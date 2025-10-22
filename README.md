@@ -74,7 +74,7 @@ pwsh ./src/mainScript.ps1 --assign-group "<group-display-name>" --mde
 ```
 
 Common switches:
-- `--assign-group "GroupName"`   Assign newly created items to a group
+- `--assign-group="GroupName"`   Assign newly created items to a group
 - `--mde`                         Include Defender (MDE) manifests under `mde/`
 - `--remove-all`                  Delete existing Intune objects with the current prefix before import
 - `--prefix="[intune-my-macs] "`  Override the default naming prefix
