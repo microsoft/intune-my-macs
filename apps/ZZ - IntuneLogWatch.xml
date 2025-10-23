@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+  <Type>Package</Type>
+  <Name>Intune Log Watch</Name>
+  <Description>Provides a visual way to view and monitor the Intune Agent logs in real-time for troubleshooting and diagnostics.</Description>
+  <Platform>macOS</Platform>
+  <Category>Utilities</Category>
+  <SourceFile>apps/ZZ - IntuneLogWatch.pkg</SourceFile>
+  <Package>
+    <PrimaryBundleId>com.gilburns.IntuneLogWatch</PrimaryBundleId>
+    <PrimaryBundleVersion>1.0</PrimaryBundleVersion>
+    <Publisher>Gil Burns</Publisher>
+    <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
+    <IgnoreVersionDetection>true</IgnoreVersionDetection>
+  </Package>
+</MacIntuneManifest>
