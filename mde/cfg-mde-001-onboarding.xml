@@ -1,0 +1,10 @@
+<MacIntuneManifest>
+  <ReferenceId>CFG-MDE-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>CustomConfig</Type>
+  <Name>CFG-MDE-001 - Microsoft Defender Onboarding Profile</Name>
+  <Description>Onboards Microsoft Defender for Endpoint using a macOS custom configuration (mobileconfig) profile.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>mde/cfg-mde-001-onboarding.mobileconfig</SourceFile>
+</MacIntuneManifest>

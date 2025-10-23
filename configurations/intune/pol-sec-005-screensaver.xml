@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-SEC-005</ReferenceId>
+  <Version>1.0</Version>
+	<Type>Policy</Type>
+	<Name>POL-SEC-005 - Screensaver Security</Name>
+	<Description>Configures comprehensive screensaver security settings to protect unattended devices. Sets screensaver to activate after 10 minutes of inactivity (user setting), requires password authentication after 60 seconds of screensaver activation, sets login window idle timeout to 20 minutes, and enforces the Flurry screensaver module for both system and user contexts.</Description>
+	<Platform>macOS</Platform>
+	<Category>Security</Category>
+	<SourceFile>configurations/intune/pol-sec-005-screensaver.json</SourceFile>
+	<SettingsCount>2</SettingsCount>
+</MacIntuneManifest>

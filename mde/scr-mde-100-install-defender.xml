@@ -1,0 +1,16 @@
+<MacIntuneManifest>
+  <ReferenceId>SCR-MDE-100</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Script</Type>
+  <Name>SCR-MDE-100 - Install Microsoft Defender</Name>
+  <Description>Install Microsoft Defender for Endpoint (PKG); waits for core Microsoft apps, ensures Rosetta, uses Last-Modified for update skip.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>mde/scr-mde-100-install-defender.zsh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

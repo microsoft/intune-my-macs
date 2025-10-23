@@ -1,8 +1,0 @@
-<MacIntuneManifest>
-	<Type>CustomConfig</Type>
-	<Name>Login Window Security Configuration</Name>
-	<Description>Essential login window security configuration for macOS devices. Disables FileVault auto-login to ensure users must explicitly authenticate, blocks external account authentication for tighter access control, and prevents administrators from disabling managed preferences to maintain security policy enforcement.</Description>
-	<Platform>macOS</Platform>
-	<Category>Security</Category>
-	<SourceFile>configurations/intune/LoginWindowSecurityConfiguration.mobileconfig</SourceFile>
-</MacIntuneManifest>

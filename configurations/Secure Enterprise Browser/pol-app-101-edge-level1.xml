@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+  <ReferenceId>POL-APP-101</ReferenceId>
+  <Version>1.0</Version>
+    <Type>Policy</Type>
+    <Name>POL-APP-101 - Edge Browser Level 1 Basic</Name>
+    <Description>Enhanced basic browser configuration for Microsoft Edge addressing gap analysis findings (Certificate management, network policies, system integration)</Description>
+    <Platform>macOS</Platform>
+    <Category>Secure Enterprise Browser</Category>
+    <SourceFile>configurations/Secure Enterprise Browser/pol-app-101-edge-level1.json</SourceFile>
+    <SettingsCount>22</SettingsCount>
+</MacIntuneManifest>

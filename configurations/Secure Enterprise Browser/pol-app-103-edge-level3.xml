@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+    <ReferenceId>POL-APP-103</ReferenceId>
+    <Version>1.0</Version>
+    <Type>Policy</Type>
+    <Name>POL-APP-103 - Edge Browser Level 3 High Security</Name>
+    <Description>Maximum security browser configuration for Microsoft Edge with complete controls, isolation, and zero trust security model for high-risk macOS environments.</Description>
+    <Platform>macOS</Platform>
+    <Category>Applications</Category>
+    <SourceFile>configurations/Secure Enterprise Browser/pol-app-103-edge-level3.json</SourceFile>
+    <SettingsCount>53</SettingsCount>
+</MacIntuneManifest>

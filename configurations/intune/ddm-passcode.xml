@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-  <Type>Policy</Type>
-  <Name>DDM Passcode</Name>
-  <Description>Enforces passcode requirements including length, complexity, failed attempts, and expiration.</Description>
-  <Platform>macOS</Platform>
-  <Category>Security</Category>
-  <SourceFile>configurations/intune/ddm-passcode.json</SourceFile>
-  <SettingsCount>12</SettingsCount>
-</MacIntuneManifest>

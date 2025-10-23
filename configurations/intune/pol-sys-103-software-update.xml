@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+  <ReferenceId>POL-SYS-103</ReferenceId>
+  <Version>1.0</Version>
+    <Type>Policy</Type>
+    <Name>POL-SYS-103 - Software Update Policy</Name>
+    <Description>Manages macOS software updates with automatic installation at 1:00 AM (3-day delay for latest updates), enables standard user OS updates, automatic download/install of OS and security updates, enables notifications and Rapid Security Response (RSR) updates for immediate threat mitigation.</Description>
+    <Platform>macOS</Platform>
+    <Category>Software Updates</Category>
+    <SourceFile>configurations/intune/pol-sys-103-software-update.json</SourceFile>
+    <SettingsCount>2</SettingsCount>
+</MacIntuneManifest>

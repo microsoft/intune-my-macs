@@ -1,8 +1,0 @@
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>MDE - Windows Defender ATP Onboarding</Name>
-  <Description>Onboards Microsoft Defender for Endpoint using a macOS custom configuration (mobileconfig) profile.</Description>
-  <Platform>macOS</Platform>
-  <Category>Security</Category>
-  <SourceFile>mde/WindowsDefenderATPOnboarding.mobileconfig</SourceFile>
-</MacIntuneManifest>

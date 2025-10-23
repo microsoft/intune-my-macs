@@ -1,0 +1,16 @@
+<MacIntuneManifest>
+  <ReferenceId>SCR-SYS-101</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Script</Type>
+  <Name>SCR-SYS-101 - Configure Dock</Name>
+  <Description>Configure Dock items after app installs; supports swiftDialog.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>scripts/intune/scr-sys-101-configure-dock.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

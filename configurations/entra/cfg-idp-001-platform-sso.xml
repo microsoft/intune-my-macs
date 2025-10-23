@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>CFG-IDP-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Policy</Type>
+  <Name>CFG-IDP-001 - Entra Platform SSO</Name>
+  <Description>Platform Single Sign-On (SSO) configuration for Microsoft Entra ID on macOS.</Description>
+  <Platform>macOS</Platform>
+  <Category>Identity</Category>
+  <SourceFile>configurations/entra/cfg-idp-001-platform-sso.json</SourceFile>
+  <SettingsCount>15</SettingsCount>
+</MacIntuneManifest>

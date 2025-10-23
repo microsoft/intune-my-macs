@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-SEC-003</ReferenceId>
+  <Version>1.0</Version>
+	<Type>Policy</Type>
+	<Name>POL-SEC-003 - Gatekeeper Security</Name>
+	<Description>Comprehensive Gatekeeper and system policy security configuration for macOS devices. Enables application security assessment, allows identified developers while maintaining security, enables XProtect malware upload for threat intelligence, and prevents users from overriding these critical security policies through system preferences.</Description>
+	<Platform>macOS</Platform>
+	<Category>Security</Category>
+	<SourceFile>configurations/intune/pol-sec-003-gatekeeper.json</SourceFile>
+	<SettingsCount>2</SettingsCount>
+</MacIntuneManifest>

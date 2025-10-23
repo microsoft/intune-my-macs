@@ -1,0 +1,10 @@
+<MacIntuneManifest>
+  <ReferenceId>CFG-SEC-002</ReferenceId>
+  <Version>1.0</Version>
+  <Type>CustomConfig</Type>
+  <Name>CFG-SEC-002 - Screensaver Idle Time Configuration</Name>
+  <Description>Configures screensaver idle time (10 minutes) to address Mac Evaluation Utility warning about unmanaged screensaver idle time settings. This legacy setting requires mobileconfig format as it's not available in Settings Catalog. Works in conjunction with POL-SEC-005 (Screensaver Security) which handles password requirements and other modern screensaver settings via Settings Catalog.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>configurations/intune/cfg-sec-002-screensaver-idle.mobileconfig</SourceFile>
+</MacIntuneManifest>

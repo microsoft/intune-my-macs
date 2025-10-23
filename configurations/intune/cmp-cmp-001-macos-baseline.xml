@@ -1,0 +1,10 @@
+<MacIntuneManifest>
+  <ReferenceId>CMP-CMP-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Compliance</Type>
+  <Name>CMP-CMP-001 - macOS Compliance Baseline</Name>
+  <Description>Baseline compliance: FileVault required, Firewall enabled, SIP enabled, minimum macOS 15.0. Gatekeeper configuration handled separately via configuration policy.</Description>
+  <Platform>macOS</Platform>
+  <Category>Compliance</Category>
+  <SourceFile>configurations/intune/cmp-cmp-001-macos-baseline.json</SourceFile>
+</MacIntuneManifest>

@@ -1,8 +1,0 @@
-<MacIntuneManifest>
-  <Type>Compliance</Type>
-  <Name>macOS Baseline Compliance</Name>
-  <Description>Baseline compliance: FileVault required, Firewall enabled, SIP enabled, minimum macOS 15.0. Gatekeeper configuration handled separately via configuration policy.</Description>
-  <Platform>macOS</Platform>
-  <Category>Compliance</Category>
-  <SourceFile>configurations/intune/macos-compliance.json</SourceFile>
-</MacIntuneManifest>

@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-MDE-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Policy</Type>
+  <Name>POL-MDE-001 - Microsoft Defender Settings Catalog</Name>
+  <Description>Combined Microsoft Defender for Endpoint settings catalog configuration for macOS.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>mde/pol-mde-001-settings-catalog.json</SourceFile>
+  <SettingsCount>0</SettingsCount>
+</MacIntuneManifest>

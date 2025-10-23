@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MacIntuneManifest>
+    <ReferenceId>POL-APP-102</ReferenceId>
+    <Version>1.0</Version>
+    <Type>Policy</Type>
+    <Name>POL-APP-102 - Edge Browser Level 2 Enhanced</Name>
+    <Description>Enhanced browser configuration with advanced security controls for Microsoft Edge addressing comprehensive security requirements (PKI, extensions, developer tools, advanced networking)</Description>
+    <Platform>macOS</Platform>
+    <Category>Applications</Category>
+    <SourceFile>configurations/Secure Enterprise Browser/pol-app-102-edge-level2.json</SourceFile>
+    <SettingsCount>33</SettingsCount>
+</MacIntuneManifest>

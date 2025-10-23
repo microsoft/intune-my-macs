@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-SYS-104</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Policy</Type>
+  <Name>POL-SYS-104 - DDM Passcode Configuration</Name>
+  <Description>Enforces passcode requirements including length, complexity, failed attempts, and expiration.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>configurations/intune/pol-sys-104-ddm-passcode.json</SourceFile>
+  <SettingsCount>12</SettingsCount>
+</MacIntuneManifest>

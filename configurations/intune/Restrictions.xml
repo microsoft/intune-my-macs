@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-	<Type>Policy</Type>
-	<Name>macOS Restrictions Policy</Name>
-	<Description>Comprehensive security policy for macOS devices that restricts various system features and applications to enhance enterprise security. Disables AirDrop, Activity Continuation, Game Center, cloud services, App Store, and other potentially risky features while maintaining core business functionality.</Description>
-	<Platform>macOS</Platform>
-	<Category>Device Restrictions</Category>
-	<SourceFile>configurations/intune/Restrictions.json</SourceFile>
-	<SettingsCount>1</SettingsCount>
-</MacIntuneManifest>

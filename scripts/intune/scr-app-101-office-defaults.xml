@@ -1,0 +1,16 @@
+<MacIntuneManifest>
+  <ReferenceId>SCR-APP-101</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Script</Type>
+  <Name>SCR-APP-101 - Set Office Default Applications</Name>
+  <Description>Set Microsoft Office apps as default handlers for common document types.</Description>
+  <Platform>macOS</Platform>
+  <Category>Office</Category>
+  <SourceFile>scripts/intune/scr-app-101-office-defaults.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

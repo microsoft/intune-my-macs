@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-  <Type>Policy</Type>
-  <Name>Entra Platform SSO</Name>
-  <Description>Platform Single Sign-On (SSO) configuration for Microsoft Entra ID on macOS.</Description>
-  <Platform>macOS</Platform>
-  <Category>Identity</Category>
-  <SourceFile>configurations/entra/entra-psso.json</SourceFile>
-  <SettingsCount>15</SettingsCount>
-</MacIntuneManifest>

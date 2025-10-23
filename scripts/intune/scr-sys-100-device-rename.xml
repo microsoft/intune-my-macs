@@ -1,0 +1,16 @@
+<MacIntuneManifest>
+  <ReferenceId>SCR-SYS-100</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Script</Type>
+  <Name>SCR-SYS-100 - Device Rename</Name>
+  <Description>Renames the Mac based on country code and serial number.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>scripts/intune/scr-sys-100-device-rename.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

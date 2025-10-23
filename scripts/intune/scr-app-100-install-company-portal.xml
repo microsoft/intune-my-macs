@@ -1,0 +1,16 @@
+<MacIntuneManifest>
+  <ReferenceId>SCR-APP-100</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Script</Type>
+  <Name>SCR-APP-100 - Install Company Portal</Name>
+  <Description>Install Microsoft Company Portal via signed PKG; ensures MAU and Rosetta.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>scripts/intune/scr-app-100-install-company-portal.sh</SourceFile>
+  <Script>
+    <RunAsAccount>system</RunAsAccount>
+    <BlockExecutionNotifications>true</BlockExecutionNotifications>
+    <ExecutionFrequency>PT0S</ExecutionFrequency>
+    <RetryCount>3</RetryCount>
+  </Script>
+</MacIntuneManifest>

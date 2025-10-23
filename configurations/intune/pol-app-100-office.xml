@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-APP-100</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Policy</Type>
+  <Name>POL-APP-100 - Microsoft Office Configuration</Name>
+  <Description>Configures Microsoft 365 Office update, channel, auto sign-in, diagnostic, activation, and Outlook experience settings.</Description>
+  <Platform>macOS</Platform>
+  <Category>Office</Category>
+  <SourceFile>configurations/intune/pol-app-100-office.json</SourceFile>
+  <SettingsCount>16</SettingsCount>
+</MacIntuneManifest>

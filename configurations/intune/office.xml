@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-  <Type>Policy</Type>
-  <Name>Office (Settings Catalog)</Name>
-  <Description>Configures Microsoft 365 Office update, channel, auto sign-in, diagnostic, activation, and Outlook experience settings.</Description>
-  <Platform>macOS</Platform>
-  <Category>Office</Category>
-  <SourceFile>configurations/intune/Office.json</SourceFile>
-  <SettingsCount>16</SettingsCount>
-</MacIntuneManifest>

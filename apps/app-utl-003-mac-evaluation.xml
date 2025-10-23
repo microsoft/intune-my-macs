@@ -1,0 +1,21 @@
+<MacIntuneManifest>
+  <ReferenceId>APP-UTL-003</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Package</Type>
+  <Name>APP-UTL-003 - Mac Evaluation Utility</Name>
+  <Description>Installs the Mac Evaluation Utility for assessment and troubleshooting on managed macOS devices.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>apps/app-utl-003-mac-evaluation.pkg</SourceFile>
+  <Package>
+  <DisplayName>Mac Evaluation Utility</DisplayName>
+    <FileName>MacEvaluationUtility.pkg</FileName>
+    <PreInstallScript></PreInstallScript>
+    <PostInstallScript></PostInstallScript>
+    <PrimaryBundleId>com.apple.MacEvalUtility</PrimaryBundleId>
+    <PrimaryBundleVersion>4.7.1</PrimaryBundleVersion>
+    <Publisher>Apple</Publisher>
+    <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
+    <IgnoreVersionDetection>true</IgnoreVersionDetection>
+  </Package>
+</MacIntuneManifest>

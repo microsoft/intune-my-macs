@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-SEC-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Policy</Type>
+  <Name>POL-SEC-001 - FileVault Disk Encryption</Name>
+  <Description>Configures FileVault disk encryption on macOS devices during Setup Assistant with recovery key escrow.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>configurations/intune/pol-sec-001-filevault.json</SourceFile>
+  <SettingsCount>12</SettingsCount>
+</MacIntuneManifest>

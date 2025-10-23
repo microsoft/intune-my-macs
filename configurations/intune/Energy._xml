@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-	<Type>Policy</Type>
-	<Name>Energy Saver Configuration</Name>
-	<Description>Configures power management and energy saver settings for macOS devices. Sets display sleep to 5 minutes and system sleep to 10 minutes for both desktop (AC power) and portable devices. Enables Wake on LAN for desktop computers to allow network-based device management and remote wake capabilities.</Description>
-	<Platform>macOS</Platform>
-	<Category>System Configuration</Category>
-	<SourceFile>configurations/intune/Energy.json</SourceFile>
-	<SettingsCount>1</SettingsCount>
-</MacIntuneManifest>

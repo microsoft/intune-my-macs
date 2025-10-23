@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-	<Type>Policy</Type>
-	<Name>Network Time Protocol Configuration</Name>
-	<Description>Configures macOS devices to synchronize time with Apple's official time servers (time.apple.com) to ensure accurate system time across all managed devices. Essential for security features, certificate validation, and consistent logging.</Description>
-	<Platform>macOS</Platform>
-	<Category>System Configuration</Category>
-	<SourceFile>configurations/intune/Network Time Protocol.json</SourceFile>
-	<SettingsCount>1</SettingsCount>
-</MacIntuneManifest>

@@ -1,9 +1,0 @@
-<MacIntuneManifest>
-  <Type>Policy</Type>
-  <Name>MDE - Settings Catalog Combined</Name>
-  <Description>Combined Microsoft Defender for Endpoint settings catalog configuration for macOS.</Description>
-  <Platform>macOS</Platform>
-  <Category>Security</Category>
-  <SourceFile>mde/MDE - Settings Catalog Combined.json</SourceFile>
-  <SettingsCount>0</SettingsCount>
-</MacIntuneManifest>

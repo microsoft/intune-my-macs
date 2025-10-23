@@ -1,0 +1,11 @@
+<MacIntuneManifest>
+  <ReferenceId>POL-SYS-100</ReferenceId>
+  <Version>1.0</Version>
+	<Type>Policy</Type>
+	<Name>POL-SYS-100 - Network Time Protocol</Name>
+	<Description>Configures macOS devices to synchronize time with Apple's official time servers (time.apple.com) to ensure accurate system time across all managed devices. Essential for security features, certificate validation, and consistent logging.</Description>
+	<Platform>macOS</Platform>
+	<Category>System Configuration</Category>
+	<SourceFile>configurations/intune/pol-sys-100-ntp.json</SourceFile>
+	<SettingsCount>1</SettingsCount>
+</MacIntuneManifest>

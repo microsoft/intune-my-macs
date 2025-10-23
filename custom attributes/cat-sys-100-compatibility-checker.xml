@@ -1,0 +1,13 @@
+<MacIntuneManifest>
+  <ReferenceId>CAT-SYS-100</ReferenceId>
+  <Version>1.0</Version>
+	<Type>CustomAttribute</Type>
+	<Name>CAT-SYS-100 - macOS Compatibility Checker</Name>
+	<Description>Determines the maximum supported macOS version for the current Mac by querying Apple's GDMF API with the hardware's board ID. Works with both Intel and Apple Silicon Macs to provide compatibility information for macOS upgrades.</Description>
+	<Platform>macOS</Platform>
+	<Category>Device Information</Category>
+	<SourceFile>custom attributes/cat-sys-100-compatibility-checker.zsh</SourceFile>
+	<CustomAttribute>
+		<CustomAttributeType>string</CustomAttributeType>
+	</CustomAttribute>
+</MacIntuneManifest>

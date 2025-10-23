@@ -1,0 +1,19 @@
+<MacIntuneManifest>
+  <ReferenceId>APP-UTL-002</ReferenceId>
+  <Version>1.0</Version>
+  <Type>Package</Type>
+  <Name>APP-UTL-002 - Swift Dialog Onboarding</Name>
+  <Description>Installs Swift Dialog onboarding splash screen and triggers core app installs.</Description>
+  <Platform>macOS</Platform>
+  <Category>Config</Category>
+  <SourceFile>apps/app-utl-002-dialog-onboarding.pkg</SourceFile>
+  <Package>
+    <PrimaryBundleId>com.intune.swiftdialog</PrimaryBundleId>
+    <PrimaryBundleVersion>1.3</PrimaryBundleVersion>
+    <Publisher>Microsoft</Publisher>
+    <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
+    <IgnoreVersionDetection>true</IgnoreVersionDetection>
+  <PreInstallScript>apps/app-utl-002-dialog-onboarding_pre.sh</PreInstallScript>
+  <PostInstallScript>apps/app-utl-002-dialog-onboarding_post.sh</PostInstallScript>
+  </Package>
+</MacIntuneManifest>
