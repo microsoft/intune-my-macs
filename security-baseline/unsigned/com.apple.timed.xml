@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Automatic Time Synchronization</Name>
-  <Description>Enables automatic time synchronization for macOS devices. This CIS Level 2 security baseline control sets TMAutomaticTimeOnlyEnabled to true, ensuring that system time is automatically synchronized with configured NTP servers. Accurate time synchronization is critical for security operations including certificate validation, Kerberos authentication, audit log integrity, and time-based access controls. Works in conjunction with the timeServer configuration in MCX settings.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.timed.mobileconfig</SourceFile>
-</MacIntuneManifest>

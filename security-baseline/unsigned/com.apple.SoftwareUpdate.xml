@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Software Update Settings</Name>
-    <Description>CIS Level 2 Baseline: Enables automatic download and installation of macOS updates, app updates, system data files, and critical security updates to maintain security posture.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.SoftwareUpdate.mobileconfig</SourceFile>
-</MacIntuneManifest>

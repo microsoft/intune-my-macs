@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Managed Client Preferences</Name>
-    <Description>CIS Level 2 Baseline: Enforces automatic time synchronization via NTP to ensure accurate system time for security logging and authentication.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.ManagedClient.preferences.mobileconfig</SourceFile>
-</MacIntuneManifest>

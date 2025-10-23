@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Accessibility Settings</Name>
-    <Description>CIS Level 2 Baseline: Disables audio donation for Siri improvements to enhance privacy and prevent data collection.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.Accessibility.mobileconfig</SourceFile>
-</MacIntuneManifest>

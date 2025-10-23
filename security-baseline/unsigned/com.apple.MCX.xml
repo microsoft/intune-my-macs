@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - MCX Settings</Name>
-    <Description>CIS Level 2 Baseline: Disables guest account, prevents FileVault disable, disables Internet Sharing, and configures time server (time.apple.com) for security compliance.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.MCX.mobileconfig</SourceFile>
-</MacIntuneManifest>

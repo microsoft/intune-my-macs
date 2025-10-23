@@ -1,10 +1,4 @@
-Configuration Payloads to Find
+TO-DO
 
-- Disable Auto Login
-    https://developer.apple.com/documentation/devicemanagement/loginwindow
-    DisableFDEAutoLogin
-    boolean
-    If true, the system disables the automatic login option when using FileVault.
-    Default: false
-
-    Missing from Settings Cat - messaged Ben
+1. Handle MDE Onboarding file - core repo should not contain it, if they specify --mde and it's msising we should tell them about it.
+2. Rename all payloads and policies to include ref number - also write reference naming standard

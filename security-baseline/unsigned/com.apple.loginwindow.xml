@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Login Window Settings</Name>
-    <Description>CIS Level 2 Baseline: Configures login window security with banner message, disables auto-login, shows full names instead of usernames, requires admin password for system preferences, and disables password hints.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.loginwindow.mobileconfig</SourceFile>
-</MacIntuneManifest>

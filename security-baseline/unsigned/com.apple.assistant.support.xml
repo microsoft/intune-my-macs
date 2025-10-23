@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Siri Data Sharing Restrictions</Name>
-  <Description>Disables Siri and search query data sharing with Apple. This CIS Level 2 security baseline control sets both "Search Queries Data Sharing Status" and "Siri Data Sharing Opt-In Status" to 2 (disabled), preventing transmission of user voice commands, queries, and interaction data to Apple servers. Protects privacy by ensuring that Assistant data remains local and is not used for analytics, training, or other cloud processing.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.assistant.support.mobileconfig</SourceFile>
-</MacIntuneManifest>

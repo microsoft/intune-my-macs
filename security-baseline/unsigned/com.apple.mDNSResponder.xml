@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Disable Bonjour Advertisements</Name>
-  <Description>Disables multicast DNS advertisements (Bonjour) to reduce network exposure. This CIS Level 2 security baseline control sets NoMulticastAdvertisements to true, preventing the system from advertising services via mDNS/Bonjour on the local network. Reduces attack surface by hiding services from network discovery and preventing information disclosure about running services, shares, and applications.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.mDNSResponder.mobileconfig</SourceFile>
-</MacIntuneManifest>

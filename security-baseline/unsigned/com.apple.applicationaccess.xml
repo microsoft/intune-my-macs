@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Application Access Restrictions</Name>
-  <Description>Comprehensive privacy and security restrictions for macOS applications. This CIS Level 2 security baseline control disables multiple data collection and sharing features including: AirDrop, Siri/Assistant, iCloud Desktop/Documents sync, content caching, diagnostic submission, personalized advertising, external intelligence integrations (AI), Mail summary, media sharing, Notes transcription, and Writing Tools. Enforces on-device-only dictation and a 30-day software update delay. These controls minimize data exposure, prevent unauthorized sharing, and reduce attack surface by limiting cloud-connected features.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.applicationaccess.mobileconfig</SourceFile>
-</MacIntuneManifest>

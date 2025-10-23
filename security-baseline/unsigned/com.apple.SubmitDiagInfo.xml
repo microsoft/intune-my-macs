@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Diagnostic Submission Settings</Name>
-  <Description>Disables automatic diagnostic and usage data submission to Apple. This CIS Level 2 security baseline control prevents unauthorized data collection by setting AutoSubmit to false, ensuring that diagnostic information is not transmitted without explicit user consent. Aligns with privacy and data protection requirements.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.SubmitDiagInfo.mobileconfig</SourceFile>
-</MacIntuneManifest>

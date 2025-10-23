@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Screensaver Settings</Name>
-    <Description>CIS Level 2 Baseline: Enforces screensaver activation after 20 minutes of inactivity with 5-second password delay to prevent unauthorized access to unattended systems.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.screensaver.mobileconfig</SourceFile>
-</MacIntuneManifest>

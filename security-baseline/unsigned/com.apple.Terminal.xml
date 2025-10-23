@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Terminal Secure Keyboard Entry</Name>
-  <Description>Enables Secure Keyboard Entry for Terminal application to prevent keylogging and input monitoring. This CIS Level 2 security baseline control sets SecureKeyboardEntry to true, protecting sensitive command-line inputs from being captured by other applications or processes. Critical for protecting administrative credentials and sensitive data entered in Terminal sessions.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.Terminal.mobileconfig</SourceFile>
-</MacIntuneManifest>

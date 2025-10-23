@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-    <Type>CustomConfig</Type>
-    <Name>CIS Level 2 - Safari Settings</Name>
-    <Description>CIS Level 2 Baseline: Secures Safari browser with settings including: disables auto-open safe downloads, enforces strict cookie blocking, displays full URLs, enables fraudulent website warnings, and configures privacy-focused storage policies.</Description>
-    <Platform>macOS</Platform>
-    <Category>CIS Level 2 Security Baseline</Category>
-    <SourceFile>security-baseline/unsigned/com.apple.Safari.mobileconfig</SourceFile>
-</MacIntuneManifest>

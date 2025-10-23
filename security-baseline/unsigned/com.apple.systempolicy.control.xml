@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
-  <Type>CustomConfig</Type>
-  <Name>CIS Level 2 - Gatekeeper Assessment</Name>
-  <Description>Enables Gatekeeper system policy assessment to verify downloaded applications. This CIS Level 2 security baseline control sets EnableAssessment to true, enforcing security checks on applications before they can execute. Gatekeeper verifies that apps are signed by identified developers and notarized by Apple, protecting against malware, trojans, and unauthorized software. Critical defense against execution of malicious or tampered applications.</Description>
-  <Platform>macOS</Platform>
-  <Category>CIS Level 2 Security Baseline</Category>
-  <SourceFile>security-baseline/unsigned/com.apple.systempolicy.control.mobileconfig</SourceFile>
-</MacIntuneManifest>
