@@ -226,6 +226,46 @@ function Test-BetaModule {
 $removeAll = $false
 $assignGroupName = $null
 $argsLower = $args | ForEach-Object { $_.ToLowerInvariant() }
+
+# Check for help flag
+if ($argsLower -contains '-h' -or $argsLower -contains '--help') {
+    Write-Host "`nIntune My Macs Deployment Script" -ForegroundColor Cyan
+    Write-Host "================================`n" -ForegroundColor Cyan
+    Write-Host "USAGE:" -ForegroundColor Yellow
+    Write-Host "  ./mainScript.ps1 [OPTIONS]`n"
+    Write-Host "SCOPE SELECTORS (by default, all types are imported):" -ForegroundColor Yellow
+    Write-Host "  --apps                Import only packages/applications"
+    Write-Host "  --config              Import only configuration policies"
+    Write-Host "  --compliance          Import only compliance policies"
+    Write-Host "  --scripts             Import only shell scripts"
+    Write-Host "  --custom-attributes   Import only custom attributes`n"
+    Write-Host "OPTIONAL FEATURES:" -ForegroundColor Yellow
+    Write-Host "  --mde                 Include Microsoft Defender for Endpoint (mde/) folder content"
+    Write-Host "  --security-baseline   Include security-baseline/ folder content"
+    Write-Host "  --show-all-scripts    Show all scripts during enumeration`n"
+    Write-Host "MODIFICATION OPTIONS:" -ForegroundColor Yellow
+    Write-Host "  --prefix=`"VALUE`"      Set custom prefix for all created objects (default: '[intune-my-macs] ')"
+    Write-Host "  --assign-group=`"NAME`" Assign newly created objects to specified Entra group"
+    Write-Host "  --remove-all          Delete all existing Intune objects with the configured prefix`n"
+    Write-Host "HELP:" -ForegroundColor Yellow
+    Write-Host "  -h, --help            Display this help message`n"
+    Write-Host "EXAMPLES:" -ForegroundColor Yellow
+    Write-Host "  # Import everything with default prefix"
+    Write-Host "  ./mainScript.ps1`n"
+    Write-Host "  # Import only apps and assign to a group"
+    Write-Host "  ./mainScript.ps1 --apps --assign-group=`"All Managed Macs`"`n"
+    Write-Host "  # Import config policies with custom prefix"
+    Write-Host "  ./mainScript.ps1 --config --prefix=`"[Production] `"`n"
+    Write-Host "  # Include security baseline profiles"
+    Write-Host "  ./mainScript.ps1 --config --security-baseline`n"
+    Write-Host "  # Remove all objects with the default prefix"
+    Write-Host "  ./mainScript.ps1 --remove-all`n"
+    Write-Host "NOTE:" -ForegroundColor Yellow
+    Write-Host "  If you specify any scope selector (--apps, --config, etc.), only those types will be imported."
+    Write-Host "  If no selectors are provided, all types are imported by default.`n"
+    return
+}
+
 if ($argsLower.Count -gt 0) {
     $importPolicies = $false; $importPackages = $false; $importScripts = $false; $importCompliance = $false; $importCustomAttrs = $false
     if ($argsLower -contains '--apps') { $importPackages = $true }
