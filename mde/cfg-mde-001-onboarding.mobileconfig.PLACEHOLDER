@@ -1,0 +1,32 @@
+# ⚠️ ONBOARDING FILE REQUIRED
+
+This file (`cfg-mde-001-onboarding.mobileconfig`) is **organization-specific** and must be downloaded from your Microsoft Defender Portal.
+
+## How to Get Your Onboarding File
+
+1. Go to [Microsoft Defender Portal](https://security.microsoft.com)
+2. Navigate to **Settings** > **Endpoints** > **Device management** > **Onboarding**
+3. Select **macOS** as the operating system
+4. Select **Mobile Device Management / Microsoft Intune** as the deployment method
+5. Click **Download onboarding package**
+6. Rename the downloaded file to: `cfg-mde-001-onboarding.mobileconfig`
+7. Place it in this `mde/` folder
+
+## Why This File Is Required
+
+Microsoft Defender for Endpoint requires a unique onboarding configuration that:
+- Links devices to your organization's Defender tenant
+- Contains organization-specific authentication tokens
+- Is unique per environment (cannot be shared)
+
+**Security Warning:** Never commit this file to public repositories. It's already included in `.gitignore` for your protection.
+
+## Next Steps
+
+Once you've placed the onboarding file here, run:
+
+```bash
+pwsh ./mainScript.ps1 --assign-group "Pilot Macs" --mde
+```
+
+For complete setup instructions, see [README.md](README.md) in this folder.

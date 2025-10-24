@@ -49,12 +49,12 @@ cd intune-my-macs
 
 **Basic deployment (no assignments):**
 ```bash
-pwsh ./src/mainScript.ps1
+pwsh ./mainScript.ps1
 ```
 
 **Deploy and assign to a group:**
 ```bash
-pwsh ./src/mainScript.ps1 --assign-group "Pilot Macs"
+pwsh ./mainScript.ps1 --assign-group "Pilot Macs"
 ```
 
 The script will:
@@ -95,6 +95,17 @@ Your account needs one of the following:
 - Policy and Profile Manager
 
 The script will prompt for authentication on first run and install Microsoft Graph PowerShell SDK modules if missing.
+
+### Optional: Microsoft Defender for Endpoint
+
+If deploying Microsoft Defender for Endpoint (using `--mde` flag), you need:
+
+1. **MDE License:** Microsoft Defender for Endpoint Plan 1/2, or Microsoft 365 E5/A5/G5
+2. **Onboarding File:** Download your organization's unique onboarding configuration from the [Microsoft Defender Portal](https://security.microsoft.com)
+   - Place it as: `mde/cfg-mde-001-onboarding.mobileconfig`
+   - See [mde/README.md](mde/README.md) for detailed instructions
+
+**Without the onboarding file, MDE deployment will fail.**
 
 ---
 
@@ -139,7 +150,14 @@ Three progressive Edge security configurations:
 - Swift Dialog v2.5.6
 - Swift Dialog Onboarding (with Company Portal, Office, Edge, Copilot)
 - macOS Compatibility Checker
-- Microsoft Defender for Endpoint
+
+### 🛡️ Microsoft Defender for Endpoint (Optional)
+**Note:** Requires additional setup - see [mde/README.md](mde/README.md)
+- Microsoft Defender installation script
+- Defender settings catalog configuration
+- Onboarding profile (you must provide your organization's onboarding file)
+
+**To deploy MDE:** Use the `--mde` flag when running mainScript.ps1
 
 ### Custom Attributes
 - macOS compatibility checker for hardware assessment
@@ -168,7 +186,8 @@ Five PowerShell and Python utilities help you manage and analyze your Intune con
 
 ```
 intune-my-macs/
-├── configurations/           # Intune configuration policies and profiles
+├── mainScript.ps1           # Main deployment automation script
+├── configurations/          # Intune configuration policies and profiles
 │   ├── intune/              # Device restrictions, compliance, security
 │   ├── entra/               # Entra ID Platform SSO configuration
 │   └── Secure Enterprise Browser/  # Three levels of Edge security
@@ -177,8 +196,7 @@ intune-my-macs/
 ├── apps/                    # .pkg installers and app deployment configs
 ├── mde/                     # Microsoft Defender for Endpoint configuration
 ├── custom attributes/       # Custom inventory attributes
-├── tools/                   # Management and documentation utilities
-└── src/                     # Main deployment automation script
+└── tools/                   # Management and documentation utilities
 
 ```
 
@@ -194,7 +212,7 @@ Each configuration, script, and app includes:
 ### Deploy Everything with Assignments
 
 ```bash
-pwsh ./src/mainScript.ps1 --assign-group "Pilot Macs"
+pwsh ./mainScript.ps1 --assign-group "Pilot Macs"
 ```
 
 Uploads all configurations and assigns them to the specified Azure AD group.
@@ -316,9 +334,9 @@ echo '*.pkg' >> .gitignore
 
 ### Run the Main Import Script
 
-From the `src` directory run `mainScript.ps1` (PowerShell 7 recommended):
-```
-pwsh ./src/mainScript.ps1 --assign-group "<group-display-name>" --mde
+From the repository root, run `mainScript.ps1` (PowerShell 7 recommended):
+```bash
+pwsh ./mainScript.ps1 --assign-group "<group-display-name>" --mde
 ```
 
 Common switches:

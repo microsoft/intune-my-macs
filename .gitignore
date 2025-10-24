@@ -1,2 +1,6 @@
 configurations/.DS_Store
 .DS_Store
+.venv
+
+# MDE onboarding file (organization-specific, do not commit)
+mde/cfg-mde-001-onboarding.mobileconfig

@@ -38,10 +38,9 @@ $policyPrefix = "[intune-my-macs] "
 # connect to Graph (add apps scope + groups for assignments + scripts for shell scripts)
 Connect-MgGraph -Scopes "DeviceManagementConfiguration.ReadWrite.All,DeviceManagementApps.ReadWrite.All,DeviceManagementScripts.ReadWrite.All,Group.Read.All" -NoWelcome
 
-# Resolve repo root, if we cannot resolve we should exit (script is in src/)
+# Resolve repo root (script is now in repository root)
 $repoRoot = $PSScriptRoot
 if (-not $repoRoot) { $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path -ErrorAction Continue}
-$repoRoot = Split-Path -Parent $repoRoot
 if (-not $repoRoot) { Write-Error "Failed to resolve repository root; aborting."; exit 1 }
 
 # ===================== Overview =====================
@@ -529,6 +528,36 @@ if (-not $includeMde) {
     if ($removed -gt 0) { Write-Host "Excluded $removed mde/ manifest(s) (use --mde to include)." -ForegroundColor DarkGray }
 } else {
     Write-Host "Including mde/ manifests (--mde specified)." -ForegroundColor DarkGray
+    
+    # Validate that the required MDE onboarding file exists
+    $mdeOnboardingFile = Join-Path $PSScriptRoot "mde/cfg-mde-001-onboarding.mobileconfig"
+    if (-not (Test-Path $mdeOnboardingFile)) {
+        Write-Host ""
+        Write-Host "╔══════════════════════════════════════════════════════════════════════════════╗" -ForegroundColor Red
+        Write-Host "║  ERROR: Microsoft Defender for Endpoint onboarding file is missing!         ║" -ForegroundColor Red
+        Write-Host "╚══════════════════════════════════════════════════════════════════════════════╝" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "The --mde flag requires the onboarding configuration file, but it was not found at:" -ForegroundColor Yellow
+        Write-Host "  $mdeOnboardingFile" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "This file is organization-specific and must be downloaded from your Microsoft" -ForegroundColor Yellow
+        Write-Host "Defender Portal. Each organization has a unique onboarding configuration." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "To obtain your onboarding file:" -ForegroundColor White
+        Write-Host "  1. Go to: https://security.microsoft.com" -ForegroundColor Cyan
+        Write-Host "  2. Navigate to: Settings > Endpoints > Device management > Onboarding" -ForegroundColor Cyan
+        Write-Host "  3. Select OS: macOS" -ForegroundColor Cyan
+        Write-Host "  4. Select method: Mobile Device Management / Microsoft Intune" -ForegroundColor Cyan
+        Write-Host "  5. Download the onboarding package" -ForegroundColor Cyan
+        Write-Host "  6. Rename to: cfg-mde-001-onboarding.mobileconfig" -ForegroundColor Cyan
+        Write-Host "  7. Place in: mde/ folder" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "For detailed instructions, see: mde/README.md" -ForegroundColor White
+        Write-Host ""
+        Write-Error "Deployment stopped. Cannot proceed without MDE onboarding file."
+        exit 1
+    }
+    Write-Host "✓ MDE onboarding file found: cfg-mde-001-onboarding.mobileconfig" -ForegroundColor Green
 }
 
 if (-not $includeSecurityBaseline) {

@@ -35,7 +35,7 @@ Choose **ONE** of the three security levels based on your organization's require
 Run the main deployment script from the repository root:
 
 ```powershell
-pwsh ./src/mainScript.ps1 --assign-group="your-security-group"
+pwsh ./mainScript.ps1 --assign-group="your-security-group"
 ```
 
 The script will automatically discover and deploy the Edge browser policy you've included.
