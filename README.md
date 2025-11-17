@@ -1,6 +1,6 @@
 # 🚀 Intune My Macs
 
-Automate a complete Microsoft Intune macOS proof-of-concept in minutes: policies, compliance, scripts, PKG apps, and optional Microsoft Defender for Endpoint (MDE) are deployed from a single script.
+Automate a Microsoft Intune macOS proof-of-concept in minutes: policies, compliance, scripts, PKG apps, and optional Microsoft Defender for Endpoint (MDE) are deployed from a single script.
 
 ---
 
@@ -30,8 +30,14 @@ winget install Microsoft.PowerShell
 ```bash
 git clone https://github.com/microsoft/intune-my-macs.git
 cd intune-my-macs
+# Preview (dry-run)
 pwsh ./mainScript.ps1 --assign-group "Intune Mac Pilot"
+
+# Push changes
+pwsh ./mainScript.ps1 --assign-group "Intune Mac Pilot" --apply
 ```
+
+> The script defaults to **dry-run mode**. Nothing is created until you add `--apply`.
 
 ### 4. Common flags
 | Flag | Purpose |
@@ -41,6 +47,7 @@ pwsh ./mainScript.ps1 --assign-group "Intune Mac Pilot"
 | `--prefix "[custom]"` | Override the default naming prefix |
 | `--mde` | Include the `mde/` content (requires onboarding file) |
 | `--remove-all` | Delete previously created objects that use the current prefix |
+| `--apply` | Actually create/update/delete Intune objects (otherwise it's a preview) |
 
 ---
 

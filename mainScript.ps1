@@ -22,7 +22,7 @@ $importScripts              = $true
 $importCompliance           = $true  # new: compliance policies
 $importCustomAttrs          = $true  # new: custom attributes
 $includeMde                 = $false # include mde/ folder content only if --mde specified
-$includeSecurityBaseline    = $false # include Security Baseline folder content only if --security-baseline specified
+$applyChanges               = $false # require --apply to move beyond dry-run mode
 
 # Initialize created object trackers per run
 $createdPolicyIds = @()
@@ -32,8 +32,8 @@ $createdScriptIds = @()
 $createdAppIds = @()
 $createdCustomAttrIds = @()  # custom attributes
 
-# set policy prefix
-$policyPrefix = "[intune-my-macs] "
+# set policy prefix (spacing appended automatically later)
+$policyPrefix = "[intune-my-macs]"
 
 # tenant ID (optional, can be specified via --tenant-id)
 $tenantId = $null
@@ -221,6 +221,29 @@ function Test-BetaModule {
     return [bool](Get-Command -Name New-MgBetaDeviceAppManagementMobileApp -ErrorAction SilentlyContinue)
 }
 
+function Get-GroupIdByName {
+    param([Parameter(Mandatory)][string]$DisplayName)
+    try {
+        $filter = [System.Uri]::EscapeDataString("displayName eq '$DisplayName'")
+        $groupResults = @()
+        $resp = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/v1.0/groups?`$filter=$filter&`$select=id,displayName"
+        if ($resp.value) { $groupResults += $resp.value }
+        while ($resp.'@odata.nextLink') {
+            $resp = Invoke-MgGraphRequest -Method GET -Uri $resp.'@odata.nextLink'
+            if ($resp.value) { $groupResults += $resp.value }
+        }
+        if ($groupResults.Count -eq 0) {
+            Write-Host "✗ Could not find an Entra group named '$DisplayName'." -ForegroundColor Red
+            return $null
+        }
+        if ($groupResults.Count -gt 1) { Write-Warning "Multiple groups matched '$DisplayName'; using first." }
+        return $groupResults[0].id
+    } catch {
+        Write-Host "✗ Failed to resolve group '$DisplayName'.`n  $_" -ForegroundColor Red
+        return $null
+    }
+}
+
 
 # Parse CLI args for selective processing
 $removeAll = $false
@@ -241,12 +264,12 @@ if ($argsLower -contains '-h' -or $argsLower -contains '--help') {
     Write-Host "  --custom-attributes   Import only custom attributes`n"
     Write-Host "OPTIONAL FEATURES:" -ForegroundColor Yellow
     Write-Host "  --mde                 Include Microsoft Defender for Endpoint (mde/) folder content"
-    Write-Host "  --security-baseline   Include security-baseline/ folder content"
     Write-Host "  --show-all-scripts    Show all scripts during enumeration`n"
     Write-Host "MODIFICATION OPTIONS:" -ForegroundColor Yellow
-    Write-Host "  --prefix=`"VALUE`"      Set custom prefix for all created objects (default: '[intune-my-macs] ')"
-    Write-Host "  --assign-group=`"NAME`" Assign newly created objects to specified Entra group"
-    Write-Host "  --tenant-id=`"GUID`"    Specify tenant ID for Microsoft Graph connection"
+    Write-Host "  --prefix `"VALUE`"      Set custom prefix for all created objects (default: '[intune-my-macs]')"
+    Write-Host "  --assign-group `"NAME`" Assign newly created objects to specified Entra group"
+    Write-Host "  --tenant-id `"GUID`"    Specify tenant ID for Microsoft Graph connection"
+    Write-Host "  --apply               Actually create/update/delete Intune objects (default: dry-run preview)"
     Write-Host "  --remove-all          Delete all existing Intune objects with the configured prefix`n"
     Write-Host "HELP:" -ForegroundColor Yellow
     Write-Host "  -h, --help            Display this help message`n"
@@ -254,19 +277,59 @@ if ($argsLower -contains '-h' -or $argsLower -contains '--help') {
     Write-Host "  # Import everything with default prefix"
     Write-Host "  ./mainScript.ps1`n"
     Write-Host "  # Import only apps and assign to a group"
-    Write-Host "  ./mainScript.ps1 --apps --assign-group=`"All Managed Macs`"`n"
+    Write-Host "  ./mainScript.ps1 --apps --assign-group `"All Managed Macs`"`n"
     Write-Host "  # Import config policies with custom prefix"
-    Write-Host "  ./mainScript.ps1 --config --prefix=`"[Production] `"`n"
-    Write-Host "  # Include security baseline profiles"
-    Write-Host "  ./mainScript.ps1 --config --security-baseline`n"
+    Write-Host "  ./mainScript.ps1 --config --prefix `"[Production]`"`n"
     Write-Host "  # Connect to a specific tenant"
-    Write-Host "  ./mainScript.ps1 --tenant-id=`"12345678-1234-1234-1234-123456789012`"`n"
+    Write-Host "  ./mainScript.ps1 --tenant-id `"12345678-1234-1234-1234-123456789012`"`n"
     Write-Host "  # Remove all objects with the default prefix"
     Write-Host "  ./mainScript.ps1 --remove-all`n"
     Write-Host "NOTE:" -ForegroundColor Yellow
+    Write-Host "  This script defaults to DRY-RUN mode. Re-run with --apply to push changes to Intune."
     Write-Host "  If you specify any scope selector (--apps, --config, etc.), only those types will be imported."
     Write-Host "  If no selectors are provided, all types are imported by default.`n"
     return
+}
+
+if ($args.Count -gt 0) {
+    $knownFlags = @('--apps','--config','--compliance','--scripts','--custom-attributes','--show-all-scripts','--remove-all','--mde','-mde','--apply','--prefix','--assign-group','--tenant-id','-h','--help')
+    $valueFlags = @('--prefix','--assign-group','--tenant-id')
+    $unknownArgs = @(); $missingValueArgs = @()
+    $idx = 0
+    while ($idx -lt $args.Count) {
+        $rawArg = $args[$idx]
+        $normalized = $rawArg.ToLowerInvariant()
+        $handled = $false
+
+        if ($normalized -like '--prefix=*' -or $normalized -like '--assign-group=*' -or $normalized -like '--tenant-id=*') {
+            $handled = $true
+        } elseif ($knownFlags -contains $normalized) {
+            $handled = $true
+            if ($valueFlags -contains $normalized -and $rawArg -notlike '--*=*') {
+                if ($idx + 1 -lt $args.Count) {
+                    $idx++  # skip the value token so it is not reprocessed
+                } else {
+                    $missingValueArgs += $rawArg
+                }
+            }
+        }
+
+        if (-not $handled) {
+            $unknownArgs += $rawArg
+        }
+        $idx++
+    }
+
+    if ($unknownArgs.Count -gt 0 -or $missingValueArgs.Count -gt 0) {
+        if ($unknownArgs.Count -gt 0) {
+            Write-Host "Unknown option(s): $($unknownArgs -join ', ')." -ForegroundColor Red
+        }
+        if ($missingValueArgs.Count -gt 0) {
+            Write-Host "Missing value for option(s): $($missingValueArgs -join ', ')." -ForegroundColor Red
+        }
+        Write-Host "Run ./mainScript.ps1 --help for usage." -ForegroundColor Yellow
+        return
+    }
 }
 
 if ($argsLower.Count -gt 0) {
@@ -280,7 +343,7 @@ if ($argsLower.Count -gt 0) {
     if ($argsLower -contains '--show-all-scripts') { $showAllScripts = $true }
     if ($argsLower -contains '--remove-all') { $removeAll = $true }
     if ($argsLower -contains '--mde' -or $argsLower -contains '-mde') { $includeMde = $true }
-    if ($argsLower -contains '--security-baseline' -or $argsLower -contains '-security-baseline') { $includeSecurityBaseline = $true }
+    if ($argsLower -contains '--apply') { $applyChanges = $true }
     # Support both --param="Value" and --param "Value" forms
     for ($i = 0; $i -lt $args.Count; $i++) {
         $arg = $args[$i]
@@ -295,7 +358,6 @@ if ($argsLower.Count -gt 0) {
         }
         if ($null -ne $value) {
             $policyPrefix = $value.Trim('"')
-            if ($policyPrefix -and ($policyPrefix[-1] -ne ' ')) { $policyPrefix += ' ' }
         }
 
         # --assign-group
@@ -331,6 +393,16 @@ if ($argsLower.Count -gt 0) {
     }
 }
 
+if ($policyPrefix -and ($policyPrefix[-1] -ne ' ')) {
+    $policyPrefix += ' '
+}
+
+if ($applyChanges) {
+    Write-Host "Mode: APPLY (Intune objects will be created/updated/deleted)." -ForegroundColor Green
+} else {
+    Write-Host "Mode: DRY-RUN (no changes will be made; pass --apply to commit)." -ForegroundColor Yellow
+}
+
 # Connect to Microsoft Graph (add apps scope + groups for assignments + scripts for shell scripts)
 $graphParams = @{
     Scopes = "DeviceManagementConfiguration.ReadWrite.All,DeviceManagementApps.ReadWrite.All,DeviceManagementScripts.ReadWrite.All,Group.Read.All"
@@ -342,19 +414,28 @@ if ($tenantId) {
 }
 Connect-MgGraph @graphParams
 
+$resolvedGroupId = $null
+if ($assignGroupName) {
+    Write-Host "Validating assignment group '$assignGroupName'..." -ForegroundColor Cyan
+    $resolvedGroupId = Get-GroupIdByName -DisplayName $assignGroupName
+    if ($resolvedGroupId) {
+        Write-Host "✓ Assignment group resolved (ID: $resolvedGroupId)." -ForegroundColor Green
+    } else {
+        Write-Host "No changes made because the group '$assignGroupName' does not exist (or you lack permission to read it)." -ForegroundColor Red
+        Write-Host "Double-check the exact display name in Entra ID or rerun without --assign-group." -ForegroundColor Yellow
+        return
+    }
+}
+
 function Remove-IntunePrefixedContent {
     param(
-        [string]$Prefix
+        [string]$Prefix,
+        [bool]$ApplyChanges = $false
     )
     if (-not $Prefix) { Write-Error "Prefix is empty; refusing to continue."; return }
     Write-Host "Scanning Intune for policies, custom configs (mobileconfig), compliance policies, scripts, custom attributes, and apps beginning with prefix: '$Prefix'" -ForegroundColor Cyan
 
-    # Build OData filter strings - the entire filter expression gets URL encoded
-    $escapedFilterPolicies       = [System.Uri]::EscapeDataString("startsWith(name,'$Prefix')")
-    $escapedFilterCompliance     = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
-    $escapedFilterScripts        = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
-    $escapedFilterCustomAttrs    = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
-    $escapedFilterApps           = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
+    # Build OData filter string for macOS custom configuration deviceConfiguration lookup
     $escapedFilterDeviceConfigs  = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
 
     $policies = @(); $customConfigs = @(); $compliancePolicies = @(); $scripts = @(); $customAttrs = @(); $apps = @()
@@ -492,6 +573,12 @@ function Remove-IntunePrefixedContent {
     }
 
     Write-Host "Summary: $pCount config policies, $xCount custom configs, $cCount compliance policies, $sCount scripts, $caCount custom attributes, $aCount apps will be permanently removed." -ForegroundColor Cyan
+
+    if (-not $ApplyChanges) {
+        Write-Host "[dry-run] Skipping deletion because --apply was not provided." -ForegroundColor Yellow
+        return
+    }
+
     $confirmation = Read-Host -Prompt "Type YES to confirm deletion or anything else to cancel"
     if ($confirmation -ne 'YES') { Write-Host "Deletion aborted by user." -ForegroundColor Yellow; return }
 
@@ -538,7 +625,7 @@ function Remove-IntunePrefixedContent {
 }
 
 if ($removeAll) {
-    Remove-IntunePrefixedContent -Prefix $policyPrefix
+    Remove-IntunePrefixedContent -Prefix $policyPrefix -ApplyChanges $applyChanges
     return
 }
 
@@ -604,15 +691,6 @@ if (-not $includeMde) {
         exit 1
     }
     Write-Host "✓ MDE onboarding file found: cfg-mde-001-onboarding.mobileconfig" -ForegroundColor Green
-}
-
-if (-not $includeSecurityBaseline) {
-    $pre = $distributedItems.Count
-    $distributedItems = $distributedItems | Where-Object { $_.filePath -notmatch '(^|/)security-baseline/' }
-    $removed = $pre - $distributedItems.Count
-    if ($removed -gt 0) { Write-Host "Excluded $removed security-baseline/ manifest(s) (use --security-baseline to include)." -ForegroundColor DarkGray }
-} else {
-    Write-Host "Including security-baseline/ manifests (--security-baseline specified)." -ForegroundColor DarkGray
 }
 
 if ($distributedItems.type -contains '' -or $distributedItems.type -contains $null) { Write-Error "One or more XML manifests invalid (missing Type)."; exit 1 }
@@ -1152,13 +1230,17 @@ if ($importPolicies) {
 
                 $policyContentJson = ConvertTo-Json -InputObject $policyContent -Depth 20
 
-            # create policy with json content
-            $policyImportResults = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies" -Body $policyContentJson
-            if ($policyImportResults) {
-                Write-Host "  - Policy $($policyImportResults.name) imported successfully with ID: $($policyImportResults.id)" -ForegroundColor Green
-                $createdPolicyIds += $policyImportResults.id
+            if (-not $applyChanges) {
+                Write-Host "  - [dry-run] Would create configuration policy '$($policyContent.name)'." -ForegroundColor DarkGray
             } else {
-                Write-Host "  - Policy import failed or returned no results." -ForegroundColor Red
+                # create policy with json content
+                $policyImportResults = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies" -Body $policyContentJson
+                if ($policyImportResults) {
+                    Write-Host "  - Policy $($policyImportResults.name) imported successfully with ID: $($policyImportResults.id)" -ForegroundColor Green
+                    $createdPolicyIds += $policyImportResults.id
+                } else {
+                    Write-Host "  - Policy import failed or returned no results." -ForegroundColor Red
+                }
             }
 
         } catch {
@@ -1219,12 +1301,16 @@ if ($importCompliance) {
             # Name source of truth = XML manifest
             $json.displayName = $policyPrefix + $c.name
             $body = $json | ConvertTo-Json -Depth 20
-            $resp = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/deviceCompliancePolicies" -Body $body
-            if ($resp -and $resp.id) {
-                Write-Host "  - Compliance policy imported with ID: $($resp.id)" -ForegroundColor Green
-                $createdComplianceIds += $resp.id
+            if (-not $applyChanges) {
+                Write-Host "  - [dry-run] Would create compliance policy '$($json.displayName)'." -ForegroundColor DarkGray
             } else {
-                Write-Warning "  - Import returned no ID"
+                $resp = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/deviceCompliancePolicies" -Body $body
+                if ($resp -and $resp.id) {
+                    Write-Host "  - Compliance policy imported with ID: $($resp.id)" -ForegroundColor Green
+                    $createdComplianceIds += $resp.id
+                } else {
+                    Write-Warning "  - Import returned no ID"
+                }
             }
         } catch {
             Write-Error "Failed to import compliance policy '$($c.name)': $_"
@@ -1269,12 +1355,16 @@ if ($importScripts) {
                 runAsAccount = $s.runAsAccount
             }
             $json = $body | ConvertTo-Json -Depth 5
-            $result = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceShellScripts' -Body $json
-            if ($result -and $result.id) { 
-                Write-Host "  - Script $($result.displayName) imported with ID: $($result.id)" -ForegroundColor Green 
-                $createdScriptIds += $result.id
-            } else { 
-                Write-Host "  - Script import failed (no ID)" -ForegroundColor Red 
+            if (-not $applyChanges) {
+                Write-Host "  - [dry-run] Would upload shell script '$displayName'." -ForegroundColor DarkGray
+            } else {
+                $result = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceShellScripts' -Body $json
+                if ($result -and $result.id) { 
+                    Write-Host "  - Script $($result.displayName) imported with ID: $($result.id)" -ForegroundColor Green 
+                    $createdScriptIds += $result.id
+                } else { 
+                    Write-Host "  - Script import failed (no ID)" -ForegroundColor Red 
+                }
             }
         } catch {
             Write-Error "Failed to import script '$($s.name)': $_"
@@ -1317,12 +1407,16 @@ if ($importCustomAttrs) {
                 customAttributeType = $ca.customAttributeType
             }
             $json = $body | ConvertTo-Json -Depth 5
-            $result = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceCustomAttributeShellScripts' -Body $json
-            if ($result -and $result.id) { 
-                Write-Host "  - Custom attribute $($result.displayName) imported with ID: $($result.id)" -ForegroundColor Green 
-                $createdCustomAttrIds += $result.id
-            } else { 
-                Write-Host "  - Custom attribute import failed (no ID)" -ForegroundColor Red 
+            if (-not $applyChanges) {
+                Write-Host "  - [dry-run] Would create custom attribute '$displayName'." -ForegroundColor DarkGray
+            } else {
+                $result = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceCustomAttributeShellScripts' -Body $json
+                if ($result -and $result.id) { 
+                    Write-Host "  - Custom attribute $($result.displayName) imported with ID: $($result.id)" -ForegroundColor Green 
+                    $createdCustomAttrIds += $result.id
+                } else { 
+                    Write-Host "  - Custom attribute import failed (no ID)" -ForegroundColor Red 
+                }
             }
         } catch {
             Write-Error "Failed to import custom attribute '$($ca.name)': $_"
@@ -1408,6 +1502,10 @@ if ($importPackages) {
         }
 
     if (-not $exists) { Write-Host "Package source file missing, skipping upload." -ForegroundColor Red; continue }
+    if (-not $applyChanges) {
+        Write-Host "  - [dry-run] Would upload macOS app '$displayName'." -ForegroundColor DarkGray
+        continue
+    }
     if (-not (Test-BetaModule)) { Write-Host "Required beta Graph module missing; skipping package upload." -ForegroundColor Red; continue }
     $appResult = Invoke-macOSLobAppUpload -SourceFile $assetPath `
             -displayName "$($displayName)" -Publisher "$($a.publisher)" -Description "$($desc)" `
@@ -1449,12 +1547,16 @@ if ($importPolicies) {
                     payloadFileName  = $payloadFileName
                 }
                 $body = $bodyHash | ConvertTo-Json -Depth 6
-                $resp = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations' -Body $body
-                if ($resp -and $resp.id) {
-                    Write-Host "  - Custom configuration imported with ID: $($resp.id)" -ForegroundColor Green
-                    $createdDeviceConfigIds += $resp.id
+                if (-not $applyChanges) {
+                    Write-Host "  - [dry-run] Would create custom configuration '$displayName'." -ForegroundColor DarkGray
                 } else {
-                    Write-Warning "  - Import returned no ID"
+                    $resp = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations' -Body $body
+                    if ($resp -and $resp.id) {
+                        Write-Host "  - Custom configuration imported with ID: $($resp.id)" -ForegroundColor Green
+                        $createdDeviceConfigIds += $resp.id
+                    } else {
+                        Write-Warning "  - Import returned no ID"
+                    }
                 }
             } catch {
                 $errMsg = $_.Exception.Message
@@ -1469,9 +1571,16 @@ if ($importPolicies) {
 # Perform assignments if requested
 if ($assignGroupName) {
     Write-Host ""; Write-Host "Assignment requested for group: $assignGroupName" -ForegroundColor Cyan
-    $groupId = Get-GroupIdByName -DisplayName $assignGroupName
+    $groupId = $resolvedGroupId
     if ($groupId) {
         Write-Host "Resolved group '$assignGroupName' to ID $groupId" -ForegroundColor Green
+    } else {
+        Write-Warning "Skipping assignments; group not resolved."
+    }
+    if (-not $applyChanges) {
+        Write-Host "[dry-run] Assignments skipped. Rerun with --apply to deploy them." -ForegroundColor Yellow
+    }
+    if ($applyChanges -and $groupId) {
 
     # Assign Configuration Policies via assignments resource
     foreach ($policyId in ($createdPolicyIds | Sort-Object -Unique)) {
@@ -1547,7 +1656,5 @@ if ($assignGroupName) {
         } else {
             Write-Host "Skipping app assignments (no packages imported)." -ForegroundColor DarkGray
         }
-    } else {
-        Write-Warning "Skipping assignments; group not resolved."
     }
 }
