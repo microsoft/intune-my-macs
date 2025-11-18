@@ -2,3 +2,7 @@ configurations/.DS_Store
 .DS_Store
 .venv
 
+# MDE onboarding files (contain sensitive tenant-specific configuration)
+mde/cfg-mde-001-onboarding.json
+mde/cfg-mde-001-onboarding.xml
+
