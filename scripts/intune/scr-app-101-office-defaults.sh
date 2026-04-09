@@ -42,7 +42,7 @@
 UTILUTI_PATH="/usr/local/bin/utiluti"
 UTILUTI_PKG_URL="https://github.com/scriptingosx/utiluti/releases/download/v1.1/utiluti-1.1.pkg"
 TMP_PKG="/tmp/utiluti.pkg"
-LOGFILE="/Library/Logs/IntuneScripts/setOfficeDefaultApps/setOfficeDefaultApps.log"
+LOGFILE="/Library/Logs/Microsoft/IntuneScripts/setOfficeDefaultApps/setOfficeDefaultApps.log"
 
 WORD_APP="/Applications/Microsoft Word.app"
 EXCEL_APP="/Applications/Microsoft Excel.app"
