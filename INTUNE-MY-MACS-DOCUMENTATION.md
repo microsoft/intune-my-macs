@@ -36,7 +36,7 @@ Click any reference ID to jump to detailed configuration.
 | [app-utl-001-swift-dialog](#app-utl-001-swift-dialog-package) | Package | 5 |
 | [cat-sys-100-compatibility-checker](#cat-sys-100-compatibility-checker-customattribute) | CustomAttribute | 1 |
 | [cat-sys-101-intune-agent-version](#cat-sys-101-intune-agent-version-customattribute) | CustomAttribute | 1 |
-| [cfg-idp-001-platform-sso](#cfg-idp-001-platform-sso-policy) | Policy | 15 |
+| [pol-idp-001-platform-sso](#pol-idp-001-platform-sso-policy) | Policy | 15 |
 | [cfg-sec-001-login-window](#cfg-sec-001-login-window-customconfig) | CustomConfig | 4 |
 | [cfg-sec-002-screensaver-idle](#cfg-sec-002-screensaver-idle-customconfig) | CustomConfig | 1 |
 | [cfg-sys-100-wallpaper-pppc](#cfg-sys-100-wallpaper-pppc-customconfig) | CustomConfig | 1 |
@@ -110,11 +110,11 @@ Returns the version of the Microsoft Intune Agent (Sidecar) installed on the Mac
 | --- | ----- |
 | `CustomAttributeType` | `string` |
 
-### cfg-idp-001-platform-sso (Policy)
+### pol-idp-001-platform-sso (Policy)
 
 Platform Single Sign-On (SSO) configuration for Microsoft Entra ID on macOS.
 
-**Source:** `configurations/entra/cfg-idp-001-platform-sso.json`  
+**Source:** `configurations/entra/pol-idp-001-platform-sso.json`  
 **Settings:** 15
 
 | Key | Value |
