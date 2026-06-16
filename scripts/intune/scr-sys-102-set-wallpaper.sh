@@ -28,7 +28,7 @@
 
 # Define variables
 usebingwallpaper=false # Set to true to have script fetch wallpaper from Bing
-wallpaperurl="https://raw.githubusercontent.com/microsoft/intune-my-macs/main/resources/wallpaper.png"
+wallpaperurl=""https://prodeta.nl/wallpaper/Prodeta_ICT_Wallpaper_2026.png
 wallpaperdir="/Users/Shared"
 wallpaperfile="Wallpaper.jpg"
 log="/var/log/fetchdesktopwallpaper.log"
