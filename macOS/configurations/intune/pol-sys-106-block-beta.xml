@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-SYS-106</ReferenceId>
   <Version>1.0</Version>
     <Type>Policy</Type>
@@ -10,4 +10,4 @@
     <SourceFile>configurations/intune/pol-sys-106-block-beta.json</SourceFile>
       <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>1</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

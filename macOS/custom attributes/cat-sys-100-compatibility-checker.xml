@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>CAT-SYS-100</ReferenceId>
   <Version>1.0</Version>
 	<Type>CustomAttribute</Type>
@@ -11,4 +11,4 @@
 <CustomAttribute>
 		<CustomAttributeType>string</CustomAttributeType>
 	</CustomAttribute>
-</MacIntuneManifest>
+</IntuneManifest>

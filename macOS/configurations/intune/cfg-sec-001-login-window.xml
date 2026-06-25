@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>CFG-SEC-001</ReferenceId>
   <Version>1.0</Version>
 	<Type>CustomConfig</Type>
@@ -8,4 +8,4 @@
 	<Category>Security</Category>
 	<SourceFile>configurations/intune/cfg-sec-001-login-window.mobileconfig</SourceFile>
   <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations</CreateGraphUri>
-</MacIntuneManifest>
+</IntuneManifest>

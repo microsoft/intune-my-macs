@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-SYS-100</ReferenceId>
   <Version>1.0</Version>
 	<Type>Policy</Type>
@@ -9,4 +9,4 @@
 	<SourceFile>configurations/intune/pol-sys-100-ntp.json</SourceFile>
 	  <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>1</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

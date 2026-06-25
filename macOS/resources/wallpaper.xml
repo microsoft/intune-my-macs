@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>RES-SYS-100</ReferenceId>
   <Version>1.0</Version>
   <Type>Resource</Type>
@@ -7,4 +7,4 @@
   <Platform>macOS</Platform>
   <Category>Config</Category>
   <SourceFile>resources/wallpaper.png</SourceFile>
-</MacIntuneManifest>
+</IntuneManifest>

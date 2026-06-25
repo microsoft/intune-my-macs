@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>APP-IDP-001</ReferenceId>
   <Version>1.0</Version>
   <Type>Package</Type>
@@ -16,4 +16,4 @@
     <IgnoreVersionDetection>true</IgnoreVersionDetection>
     <PreInstallScript>apps/Check-PSSO.zsh</PreInstallScript>
   </Package>
-</MacIntuneManifest>
+</IntuneManifest>

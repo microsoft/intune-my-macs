@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>CMP-CMP-001</ReferenceId>
   <Version>1.0</Version>
   <Type>Compliance</Type>
@@ -8,4 +8,4 @@
   <Category>Compliance</Category>
   <SourceFile>configurations/intune/cmp-cmp-001-macos-baseline.json</SourceFile>
   <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/deviceCompliancePolicies</CreateGraphUri>
-</MacIntuneManifest>
+</IntuneManifest>

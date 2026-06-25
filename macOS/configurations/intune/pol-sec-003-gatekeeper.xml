@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-SEC-003</ReferenceId>
   <Version>1.0</Version>
 	<Type>Policy</Type>
@@ -9,4 +9,4 @@
 	<SourceFile>configurations/intune/pol-sec-003-gatekeeper.json</SourceFile>
 	  <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>2</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-IDP-001</ReferenceId>
   <Version>1.0</Version>
   <Type>Policy</Type>
@@ -9,4 +9,4 @@
   <SourceFile>configurations/entra/pol-idp-001-platform-sso.json</SourceFile>
     <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>15</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

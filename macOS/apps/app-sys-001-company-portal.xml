@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>APP-SYS-001</ReferenceId>
   <Version>1.0</Version>
   <Type>LobApp</Type>
@@ -16,4 +16,4 @@
     <IgnoreVersionDetection>true</IgnoreVersionDetection>
     <InstallAsManaged>true</InstallAsManaged>
   </Package>
-</MacIntuneManifest>
+</IntuneManifest>

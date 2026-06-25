@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-APP-104</ReferenceId>
   <Version>1.0</Version>
   <Type>Policy</Type>
@@ -9,4 +9,4 @@
   <SourceFile>configurations/office/pol-app-104-onedrive-fda-pppc.json</SourceFile>
     <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>1</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

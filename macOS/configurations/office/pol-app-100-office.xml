@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-APP-100</ReferenceId>
   <Version>2.0</Version>
   <Type>Policy</Type>
@@ -9,4 +9,4 @@
   <SourceFile>configurations/office/pol-app-100-office.json</SourceFile>
     <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
 <SettingsCount>22</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

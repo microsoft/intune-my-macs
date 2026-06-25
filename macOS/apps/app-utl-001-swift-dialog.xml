@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>APP-UTL-001</ReferenceId>
   <Version>1.0</Version>
   <Type>Package</Type>
@@ -15,4 +15,4 @@
     <MinimumSupportedOperatingSystem>v13_0</MinimumSupportedOperatingSystem>
     <IgnoreVersionDetection>true</IgnoreVersionDetection>
   </Package>
-</MacIntuneManifest>
+</IntuneManifest>

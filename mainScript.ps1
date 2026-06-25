@@ -101,6 +101,8 @@ $applyChanges               = $false # require --apply to move beyond dry-run mo
 # Initialize created object trackers per run
 $createdPolicyIds = @()
 $createdDeviceConfigIds = @()  # classic deviceConfigurations (e.g., macOSCustomConfiguration)
+$createdPolicyDeviceConfigIds = @()  # policy payloads created in deviceConfigurations (e.g., Windows update rings)
+$createdFeatureUpdateProfileIds = @()  # policies created in windowsFeatureUpdateProfiles
 $createdComplianceIds = @()
 $createdScriptIds = @()
 $createdAppIds = @()
@@ -275,7 +277,7 @@ function Get-DistributedManifests {
     $xmlFiles = Get-ChildItem -Path $BasePath -Recurse -Filter *.xml -File -ErrorAction SilentlyContinue | Where-Object {
         try {
             $content = Get-Content -LiteralPath $_.FullName -Raw -ErrorAction Stop
-            $content -match '<MacIntuneManifest'
+            $content -match '<(MacIntuneManifest|IntuneManifest)\b'
         } catch { $false }
     }
     $items = @()
@@ -788,6 +790,8 @@ function Remove-IntunePrefixedContent {
     }
 
     $targetPolicyNames = @{}
+    $targetDeviceConfigPolicyNames = @{}
+    $targetFeatureUpdatePolicyNames = @{}
     $targetComplianceNames = @{}
     $targetCustomConfigNames = @{}
     $targetScriptNames = @{}
@@ -798,7 +802,15 @@ function Remove-IntunePrefixedContent {
     foreach ($m in $platformManifestItems) {
         $displayName = "$Prefix$($m.name)"
         switch ($m.type) {
-            'Policy'               { $targetPolicyNames[$displayName] = $true }
+            'Policy'               {
+                if ($m.createGraphUri -and $m.createGraphUri -match '/deviceConfigurations(\?|$|/)') {
+                    $targetDeviceConfigPolicyNames[$displayName] = $true
+                } elseif ($m.createGraphUri -and $m.createGraphUri -match '/windowsFeatureUpdateProfiles(\?|$|/)') {
+                    $targetFeatureUpdatePolicyNames[$displayName] = $true
+                } else {
+                    $targetPolicyNames[$displayName] = $true
+                }
+            }
             'Compliance'           { $targetComplianceNames[$displayName] = $true }
             'CustomConfig'         { $targetCustomConfigNames[$displayName] = $true }
             'Script'               { $targetScriptNames[$displayName] = $true }
@@ -813,7 +825,7 @@ function Remove-IntunePrefixedContent {
     # Build OData filter string for macOS custom configuration deviceConfiguration lookup
     $escapedFilterDeviceConfigs  = [System.Uri]::EscapeDataString("startsWith(displayName,'$Prefix')")
 
-    $policies = @(); $customConfigs = @(); $compliancePolicies = @(); $enrollmentRestrictions = @(); $scripts = @(); $customAttrs = @(); $apps = @()
+    $policies = @(); $customConfigs = @(); $featureUpdatePolicies = @(); $compliancePolicies = @(); $enrollmentRestrictions = @(); $scripts = @(); $customAttrs = @(); $apps = @()
     
     # Configuration Policies - always use client-side filtering for reliability with special characters
     Write-Host "  Scanning configuration policies..." -ForegroundColor DarkGray -NoNewline
@@ -839,6 +851,27 @@ function Remove-IntunePrefixedContent {
     } catch {
         Write-Host " failed" -ForegroundColor Red
         Write-Warning "Failed to query configuration policies: $($_.Exception.Message)"
+    }
+
+    # Feature update policies live under windowsFeatureUpdateProfiles
+    Write-Host "  Scanning feature update policies..." -ForegroundColor DarkGray -NoNewline
+    try {
+        $allFeatureUpdates = @()
+        $resp = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/beta/deviceManagement/windowsFeatureUpdateProfiles?`$select=id,displayName"
+        if ($resp.value) { $allFeatureUpdates += $resp.value }
+        while ($resp.'@odata.nextLink') {
+            $resp = Invoke-MgGraphRequest -Method GET -Uri $resp.'@odata.nextLink'
+            if ($resp.value) { $allFeatureUpdates += $resp.value }
+        }
+        if ($allFeatureUpdates) {
+            $featureUpdatePolicies = $allFeatureUpdates | Where-Object {
+                $_.displayName -and $_.displayName.StartsWith($Prefix) -and $targetFeatureUpdatePolicyNames.ContainsKey($_.displayName)
+            }
+        }
+        Write-Host " done ($($allFeatureUpdates.Count) found)" -ForegroundColor DarkGray
+    } catch {
+        Write-Host " failed" -ForegroundColor Red
+        Write-Warning "Failed to query feature update policies: $($_.Exception.Message)"
     }
     # Compliance Policies - use client-side filtering with pagination
     Write-Host "  Scanning compliance policies..." -ForegroundColor DarkGray -NoNewline
@@ -873,7 +906,10 @@ function Remove-IntunePrefixedContent {
         }
         if ($raw) {
             $customConfigs = $raw | Where-Object {
-                $_.displayName -and $_.displayName.StartsWith($Prefix) -and $targetCustomConfigNames.ContainsKey($_.displayName)
+                $_.displayName -and $_.displayName.StartsWith($Prefix) -and (
+                    $targetCustomConfigNames.ContainsKey($_.displayName) -or
+                    $targetDeviceConfigPolicyNames.ContainsKey($_.displayName)
+                )
             }
         }
         Write-Host " done" -ForegroundColor DarkGray
@@ -886,7 +922,10 @@ function Remove-IntunePrefixedContent {
             while ($resp.'@odata.nextLink') { $resp = Invoke-MgGraphRequest -Method GET -Uri $resp.'@odata.nextLink'; if ($resp.value) { $raw += $resp.value } }
             if ($raw) {
                 $customConfigs = $raw | Where-Object {
-                    $_.displayName -and $_.displayName.StartsWith($Prefix) -and $targetCustomConfigNames.ContainsKey($_.displayName)
+                    $_.displayName -and $_.displayName.StartsWith($Prefix) -and (
+                        $targetCustomConfigNames.ContainsKey($_.displayName) -or
+                        $targetDeviceConfigPolicyNames.ContainsKey($_.displayName)
+                    )
                 }
             }
         } catch { Write-Warning "Fallback deviceConfigurations query failed: $($_.Exception.Message)" }
@@ -978,12 +1017,13 @@ function Remove-IntunePrefixedContent {
 
     $pCount = ($policies | Measure-Object).Count
     $xCount = ($customConfigs | Measure-Object).Count
+    $fuCount = ($featureUpdatePolicies | Measure-Object).Count
     $cCount = ($compliancePolicies | Measure-Object).Count
     $eCount = ($enrollmentRestrictions | Measure-Object).Count
     $sCount = ($scripts  | Measure-Object).Count
     $caCount = ($customAttrs | Measure-Object).Count
     $aCount = ($apps     | Measure-Object).Count
-    if (($pCount + $xCount + $cCount + $eCount + $sCount + $caCount + $aCount) -eq 0) {
+    if (($pCount + $xCount + $fuCount + $cCount + $eCount + $sCount + $caCount + $aCount) -eq 0) {
         Write-Host "No Intune objects found with prefix '$Prefix'. Nothing to remove." -ForegroundColor Yellow
         return
     }
@@ -996,6 +1036,10 @@ function Remove-IntunePrefixedContent {
     if ($xCount -gt 0) {
         Write-Host "Custom Configs ($xCount):" -ForegroundColor Magenta
         $customConfigs | ForEach-Object { Write-Host "  • $($_.displayName)  [$($_.id)]" }
+    }
+    if ($fuCount -gt 0) {
+        Write-Host "Feature Update Policies ($fuCount):" -ForegroundColor Magenta
+        $featureUpdatePolicies | ForEach-Object { Write-Host "  • $($_.displayName)  [$($_.id)]" }
     }
     if ($cCount -gt 0) {
         Write-Host "Compliance Policies ($cCount):" -ForegroundColor Magenta
@@ -1018,7 +1062,7 @@ function Remove-IntunePrefixedContent {
         $apps | ForEach-Object { Write-Host "  • $($_.displayName)  [$($_.id)]" }
     }
 
-    Write-Host "Summary: $pCount config policies, $xCount custom configs, $cCount compliance policies, $eCount enrollment restrictions, $sCount scripts, $caCount custom attributes, $aCount apps will be permanently removed." -ForegroundColor Cyan
+    Write-Host "Summary: $pCount config policies, $xCount custom configs, $fuCount feature update policies, $cCount compliance policies, $eCount enrollment restrictions, $sCount scripts, $caCount custom attributes, $aCount apps will be permanently removed." -ForegroundColor Cyan
 
     if (-not $ApplyChanges) {
         Write-Host "[dry-run] Skipping deletion because --apply was not provided." -ForegroundColor Yellow
@@ -1045,6 +1089,13 @@ function Remove-IntunePrefixedContent {
             Invoke-MgGraphRequest -Method DELETE -Uri "https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations/$($cc.id)" | Out-Null
             Write-Host "Deleted custom config: $($cc.displayName)" -ForegroundColor Green
         } catch { Write-Warning "Failed to delete custom config $($cc.displayName): $($_.Exception.Message)" }
+    }
+    # Delete feature update policies
+    foreach ($fu in $featureUpdatePolicies) {
+        try {
+            Invoke-MgGraphRequest -Method DELETE -Uri "https://graph.microsoft.com/beta/deviceManagement/windowsFeatureUpdateProfiles/$($fu.id)" | Out-Null
+            Write-Host "Deleted feature update policy: $($fu.displayName)" -ForegroundColor Green
+        } catch { Write-Warning "Failed to delete feature update policy $($fu.displayName): $($_.Exception.Message)" }
     }
     # Delete compliance policies
     foreach ($cp in $compliancePolicies) {
@@ -1881,6 +1932,8 @@ function Remove-SettingsWithReusableReferenceIds {
 # Enumerate policies
 if ($importPolicies) {
     $createdPolicyIds = @()
+    $createdPolicyDeviceConfigIds = @()
+    $createdFeatureUpdateProfileIds = @()
     $policies = $distributedItems | Where-Object { $_.type -eq 'Policy' }
 
     Write-Host "Found $($policies.Count) policies:`n" -ForegroundColor Cyan
@@ -1902,11 +1955,22 @@ if ($importPolicies) {
         try {
             $policyContentJson = Get-Content -LiteralPath $policyPath -Raw
             $policyContent = ConvertFrom-Json -InputObject $policyContentJson -Depth 20
-                # Override JSON name with XML manifest <Name> to keep single source of truth
-                if ($policyPrefix) {
-                    $policyContent.name = $policyPrefix + $p.name
+                # Override payload display name with XML manifest <Name> to keep a single source of truth.
+                $resolvedPolicyName = if ($policyPrefix) { $policyPrefix + $p.name } else { $p.name }
+                if ($policyContent.PSObject.Properties.Name -contains 'name') {
+                    $policyContent.name = $resolvedPolicyName
+                } elseif ($policyContent.PSObject.Properties.Name -contains 'displayName') {
+                    $policyContent.displayName = $resolvedPolicyName
                 } else {
-                    $policyContent.name = $p.name
+                    $policyContent | Add-Member -NotePropertyName displayName -NotePropertyValue $resolvedPolicyName -Force
+                }
+
+                $policyDisplayName = if ($policyContent.PSObject.Properties.Name -contains 'name') {
+                    $policyContent.name
+                } elseif ($policyContent.PSObject.Properties.Name -contains 'displayName') {
+                    $policyContent.displayName
+                } else {
+                    $resolvedPolicyName
                 }
 
                 $policyContentJson = ConvertTo-Json -InputObject $policyContent -Depth 20
@@ -1927,7 +1991,7 @@ if ($importPolicies) {
                 }
 
             if (-not $applyChanges) {
-                Write-Host "  - [dry-run] Would create configuration policy '$($policyContent.name)'." -ForegroundColor DarkGray
+                Write-Host "  - [dry-run] Would create configuration policy '$policyDisplayName'." -ForegroundColor DarkGray
             } else {
                 # create policy with json content
                 $policyImportResults = $null
@@ -1959,9 +2023,26 @@ if ($importPolicies) {
                 }
 
                 if ($policyImportResults) {
-                    Write-Host "  - Policy $($policyImportResults.name) imported successfully with ID: $($policyImportResults.id)" -ForegroundColor Green
-                    $createdPolicyIds += $policyImportResults.id
-                    Add-CreatedObject -Platform $p.platform -Type 'Policy' -Name $policyImportResults.name -Id $policyImportResults.id
+                    $resultName = if ($policyImportResults.PSObject.Properties.Name -contains 'name') {
+                        $policyImportResults.name
+                    } elseif ($policyImportResults.PSObject.Properties.Name -contains 'displayName') {
+                        $policyImportResults.displayName
+                    } else {
+                        $policyDisplayName
+                    }
+                    Write-Host "  - Policy $resultName imported successfully with ID: $($policyImportResults.id)" -ForegroundColor Green
+                    if ($p.createGraphUri -and $p.createGraphUri -match '/deviceConfigurations(\?|$|/)') {
+                        # Some Windows policy payloads (for example update rings) are created in deviceConfigurations
+                        # and must be assigned through the deviceConfigurations assignment endpoint.
+                        $createdDeviceConfigIds += $policyImportResults.id
+                        $createdPolicyDeviceConfigIds += $policyImportResults.id
+                    } elseif ($p.createGraphUri -and $p.createGraphUri -match '/windowsFeatureUpdateProfiles(\?|$|/)') {
+                        # Windows feature update profiles are created and assigned via windowsFeatureUpdateProfiles.
+                        $createdFeatureUpdateProfileIds += $policyImportResults.id
+                    } else {
+                        $createdPolicyIds += $policyImportResults.id
+                    }
+                    Add-CreatedObject -Platform $p.platform -Type 'Policy' -Name $resultName -Id $policyImportResults.id
                 } else {
                     Write-Host "  - Policy import failed or returned no results." -ForegroundColor Red
                 }
@@ -2229,9 +2310,18 @@ if ($importPackages) {
                         if ($pkgVersion) {
                             $pkgVersion = $pkgVersion.Trim()
                             [xml]$manifestXml = Get-Content $cpManifestPath -Raw
-                            $manifestXml.MacIntuneManifest.Package.PrimaryBundleVersion = $pkgVersion
-                            $manifestXml.Save($cpManifestPath)
-                            Write-Host "  Updated PrimaryBundleVersion to $pkgVersion" -ForegroundColor Green
+                            $manifestRoot = $manifestXml.DocumentElement
+                            if ($manifestRoot -and $manifestRoot.Name -in @('MacIntuneManifest','IntuneManifest')) {
+                                $packageNode = $manifestRoot.SelectSingleNode('Package')
+                                if ($packageNode) {
+                                    $bundleVersionNode = $packageNode.SelectSingleNode('PrimaryBundleVersion')
+                                    if ($bundleVersionNode) {
+                                        $bundleVersionNode.InnerText = $pkgVersion
+                                        $manifestXml.Save($cpManifestPath)
+                                        Write-Host "  Updated PrimaryBundleVersion to $pkgVersion" -ForegroundColor Green
+                                    }
+                                }
+                            }
                         }
                     }
                 } finally {
@@ -2429,8 +2519,29 @@ if ($assignGroupName) {
         try {
             $assignBody = @{ assignments = @(@{ target = @{ '@odata.type' = '#microsoft.graph.groupAssignmentTarget'; groupId = $groupId } }) } | ConvertTo-Json -Depth 6
             Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations/$devCfgId/assign" -Body $assignBody | Out-Null
-            Write-Host "Assigned custom config $devCfgId to group" -ForegroundColor Green
-        } catch { Write-Warning "Failed to assign custom config ${devCfgId}: $($_.Exception.Message)" }
+            if ($createdPolicyDeviceConfigIds -contains $devCfgId) {
+                Write-Host "Assigned policy $devCfgId to group" -ForegroundColor Green
+            } else {
+                Write-Host "Assigned custom config $devCfgId to group" -ForegroundColor Green
+            }
+        } catch {
+            if ($createdPolicyDeviceConfigIds -contains $devCfgId) {
+                Write-Warning "Failed to assign policy ${devCfgId}: $($_.Exception.Message)"
+            } else {
+                Write-Warning "Failed to assign custom config ${devCfgId}: $($_.Exception.Message)"
+            }
+        }
+    }
+
+    # Assign feature update policies (windowsFeatureUpdateProfiles)
+    foreach ($fuId in ($createdFeatureUpdateProfileIds | Sort-Object -Unique)) {
+        try {
+            $assignBody = @{ assignments = @(@{ target = @{ '@odata.type' = '#microsoft.graph.groupAssignmentTarget'; groupId = $groupId } }) } | ConvertTo-Json -Depth 6
+            Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/deviceManagement/windowsFeatureUpdateProfiles/$fuId/assign" -Body $assignBody | Out-Null
+            Write-Host "Assigned policy $fuId to group" -ForegroundColor Green
+        } catch {
+            Write-Warning "Failed to assign policy ${fuId}: $($_.Exception.Message)"
+        }
     }
 
     # Assign Compliance Policies (deviceCompliancePolicies)

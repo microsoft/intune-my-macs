@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>SCR-UTL-100</ReferenceId>
   <Version>2.1</Version>
   <Type>Script</Type>
@@ -14,4 +14,4 @@
     <ExecutionFrequency>PT0S</ExecutionFrequency>
     <RetryCount>3</RetryCount>
   </Script>
-</MacIntuneManifest>
+</IntuneManifest>

@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>POL-SYS-105</ReferenceId>
   <Version>1.0</Version>
 	<Type>EnrollmentRestriction</Type>
@@ -9,4 +9,4 @@
 	<SourceFile>configurations/intune/pol-sys-105-enrollment-restriction.json</SourceFile>
 	  <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/deviceEnrollmentConfigurations</CreateGraphUri>
 <SettingsCount>1</SettingsCount>
-</MacIntuneManifest>
+</IntuneManifest>

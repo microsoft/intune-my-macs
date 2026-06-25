@@ -1,4 +1,4 @@
-<MacIntuneManifest>
+<IntuneManifest>
   <ReferenceId>CFG-SYS-100</ReferenceId>
   <Version>1.0</Version>
   <Type>CustomConfig</Type>
@@ -8,4 +8,4 @@
   <Category>Config</Category>
   <SourceFile>configurations/intune/cfg-sys-100-wallpaper-pppc.mobileconfig</SourceFile>
   <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations</CreateGraphUri>
-</MacIntuneManifest>
+</IntuneManifest>
