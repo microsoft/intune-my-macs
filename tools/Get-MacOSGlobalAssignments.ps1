@@ -34,7 +34,7 @@ Requires Microsoft.Graph.Authentication (Connect-MgGraph) and sufficient Intune 
 #>
 
 # Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
+
 
 param(
     [switch]$OutputJson,
