@@ -24,6 +24,20 @@ The script flags objects assigned to:
 - **All Devices** (`allDevicesAssignmentTarget`) - Applies to every device in the tenant
 - **All Users** (`allLicensedUsersAssignmentTarget`) - Applies to all licensed users
 
+For each global assignment it also reports whether an **assignment filter** is
+applied, resolving the filter's GUID to its display name and showing the mode
+(`include` or `exclude`). Rows with **no filter** on their global assignment are
+highlighted in **red** in the console table to call out the broadest, unscoped
+targeting.
+
+### Performance
+
+All list queries (assignment filters plus the six object categories) are
+retrieved in a **single Microsoft Graph `$batch` request** with
+`$expand=assignments`, so assignments come back inline. This collapses what
+used to be many sequential round trips into one, with additional pages fetched
+only when a category exceeds the page size.
+
 ## Requirements
 
 - **PowerShell 7+** (cross-platform) or Windows PowerShell 5.1
@@ -44,23 +58,21 @@ pwsh ./tools/Get-MacOSGlobalAssignments.ps1
 Output:
 
 ```text
-Collecting configurationPolicies (settings catalog macOS)...
-Collecting classic deviceConfigurations (macOS types)...
-Collecting deviceCompliancePolicies (macOS)...
-Collecting deviceShellScripts (macOS shell scripts)...
-Collecting deviceCustomAttributeShellScripts (macOS)...
-Collecting macOS mobileApps (all macOS app types)...
+Collecting macOS objects (single batched request)...
 
-Type                  Name                           Id              AllDevices AllUsers Intent   Platforms
-----                  ----                           --              ---------- -------- ------   ---------
-CompliancePolicy      macOS Baseline Compliance      a1b2...                True    False          macOS
-CustomAttribute       Rosetta Installed              c3d4...                True    False          macOS
-DeviceConfiguration   FileVault Policy               abc1...                True    False          macOS
-SettingsCatalogPolicy macOS Security Baseline        def6...                True     True          macOS
-ShellScript           Rosetta Check First Run Script 0b6c...                True    False          macOS
-macOSApp              Company Portal                 jkl2...               False     True available macOS
+Type                  Name                           Id              AllDevices AllUsers Filter            Intent   Platforms
+----                  ----                           --              ---------- -------- ------            ------   ---------
+CompliancePolicy      macOS Baseline Compliance      a1b2...                True    False                          macOS
+CustomAttribute       Rosetta Installed              c3d4...                True    False Corporate (include)       macOS
+DeviceConfiguration   FileVault Policy               abc1...                True    False                          macOS
+SettingsCatalogPolicy macOS Security Baseline        def6...                True     True Corporate (include)       macOS
+ShellScript           Rosetta Check First Run Script 0b6c...                True    False                          macOS
+macOSApp              Company Portal                 jkl2...               False     True                 available macOS
 macOSApp              Microsoft Defender             m3n4...                True    False required macOS
 ```
+
+> Rows with an empty `Filter` (global assignment with no assignment filter) are
+> printed in **red** to highlight unscoped targeting.
 
 ### Parameters
 
@@ -118,6 +130,7 @@ pwsh ./tools/Get-MacOSGlobalAssignments.ps1 -Unassign -Force
 | `Id` | Intune object GUID |
 | `AllDevices` | `True` if assigned to All Devices |
 | `AllUsers` | `True` if assigned to All Users |
+| `Filter` | Assignment filter(s) applied to the global assignment, shown as `FilterName (include\|exclude)`. Empty when no filter is applied — these rows are highlighted in **red**. |
 | `Intent` | App install intent for the global assignment(s): `required`, `available`, `availableWithoutEnrollment`, `uninstall`, or a comma-separated combination. Empty for non-app rows. |
 | `Platforms` | Platform(s) the object targets |
 
@@ -135,6 +148,7 @@ Same columns as console output, suitable for Excel or reporting tools.
     "Id": "abc12345-6789-0123-4567-890abcdef012",
     "AllDevices": true,
     "AllUsers": false,
+    "Filter": "",
     "Intent": "",
     "Platforms": "macOS"
   },
@@ -144,6 +158,7 @@ Same columns as console output, suitable for Excel or reporting tools.
     "Id": "m3n4o5p6-...",
     "AllDevices": true,
     "AllUsers": false,
+    "Filter": "Corporate (include)",
     "Intent": "required",
     "Platforms": "macOS"
   }
@@ -277,6 +292,8 @@ if ($results) {
 ## Notes
 
 - Uses Microsoft Graph **beta** endpoint for full macOS support
+- All categories are fetched in a single Graph `$batch` request using `$expand=assignments`; additional pages are pulled only when a category exceeds the page size (so tenants with more than 100 objects in a category are still fully covered)
+- Assignment filter GUIDs are resolved to display names via the `deviceManagement/assignmentFilters` list (retrieved in the same batch)
 - Shell scripts (`deviceShellScripts`) and custom attribute shell scripts (`deviceCustomAttributeShellScripts`) are macOS-only endpoints; no platform filter is needed for those
-- For shell scripts and custom attributes, assignments are fetched via `$expand=assignments` on the list endpoint because the per-object `/assignments` sub-endpoint returns HTTP 400 on some tenants
+- For shell scripts and custom attributes, assignments come from `$expand=assignments` on the list endpoint because the per-object `/assignments` sub-endpoint returns HTTP 400 on some tenants
 - The script only surfaces macOS objects, even though some APIs return cross-platform data
