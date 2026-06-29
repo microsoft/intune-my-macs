@@ -292,7 +292,7 @@ if ($results) {
 ## Notes
 
 - Uses Microsoft Graph **beta** endpoint for full macOS support
-- All categories are fetched in a single Graph `$batch` request using `$expand=assignments`; additional pages are pulled only when a category exceeds the page size
+- All categories are fetched in a single Graph `$batch` request using `$expand=assignments`; additional pages are pulled only when a category exceeds the page size (so tenants with more than 100 objects in a category are still fully covered)
 - Assignment filter GUIDs are resolved to display names via the `deviceManagement/assignmentFilters` list (retrieved in the same batch)
 - Shell scripts (`deviceShellScripts`) and custom attribute shell scripts (`deviceCustomAttributeShellScripts`) are macOS-only endpoints; no platform filter is needed for those
 - For shell scripts and custom attributes, assignments come from `$expand=assignments` on the list endpoint because the per-object `/assignments` sub-endpoint returns HTTP 400 on some tenants
