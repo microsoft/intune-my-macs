@@ -13,6 +13,8 @@ Queries Microsoft Graph (beta) for:
 For each object, retrieves its assignments and flags whether it is targeted to:
   - All Devices (allDevicesAssignmentTarget)
   - All Users (allLicensedUsersAssignmentTarget)
+For any such global assignment it also reports whether an assignment filter is
+applied (filter display name and include/exclude mode).
 Outputs a table and (optionally) JSON/CSV.
 
 .PARAMETER OutputJson
@@ -30,9 +32,9 @@ Optional path to write CSV export of results.
 .NOTES
 Requires Microsoft.Graph.Authentication (Connect-MgGraph) and sufficient Intune permissions (DeviceManagementConfiguration.Read.All, DeviceManagementApps.Read.All).
 #>
-
+     
 # Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
+
 
 param(
     [switch]$OutputJson,
@@ -60,32 +62,77 @@ function Ensure-GraphConnection {
     }
 }
 
-function Invoke-GraphAllPages {
+function Get-GraphBatchResults {
+    # Submits multiple GET list requests in a single Graph $batch round trip,
+    # then drains any per-request nextLink pages (rare for small tenants).
+    # $Requests: ordered/hashtable of id => version-relative URL (leading '/').
     param(
-        [Parameter(Mandatory)] [string]$Uri,
-        [hashtable]$Headers,
-        [int]$PageSize = 100
+        [Parameter(Mandatory)] $Requests
     )
-    $results = @()
-    $next = "$Uri`?`$top=$PageSize"
-    while ($next) {
-        $resp = Invoke-MgGraphRequest -Method GET -Uri $next -Headers $Headers
-        if ($resp.value) { $results += $resp.value }
-        $next = $resp.'@odata.nextLink'
+    $base = 'https://graph.microsoft.com/beta'
+    $reqList = foreach ($id in $Requests.Keys) {
+        @{ id = [string]$id; method = 'GET'; url = $Requests[$id] }
     }
-    return $results
+    $body = @{ requests = @($reqList) } | ConvertTo-Json -Depth 5
+    $resp = Invoke-MgGraphRequest -Method POST -Uri "$base/`$batch" -Body $body -ContentType 'application/json'
+
+    $out = @{}
+    foreach ($r in $resp.responses) {
+        $items = [System.Collections.Generic.List[object]]::new()
+        if ($r.status -ge 200 -and $r.status -lt 300 -and $r.body) {
+            if ($r.body.value) { $items.AddRange([object[]]$r.body.value) }
+            $next = $r.body.'@odata.nextLink'
+            while ($next) {
+                $page = Invoke-MgGraphRequest -Method GET -Uri $next
+                if ($page.value) { $items.AddRange([object[]]$page.value) }
+                $next = $page.'@odata.nextLink'
+            }
+        } elseif ($r.status -ge 400) {
+            Write-Warning "Batch request '$($r.id)' failed (HTTP $($r.status)); results for that category may be incomplete."
+        }
+        $out[$r.id] = $items
+    }
+    return $out
 }
 
-function Get-AssignmentsForObject {
+function Get-FilterDisplay {
     param(
-        [string]$Uri # full assignments URI
+        $Target,
+        [hashtable]$FilterLookup
     )
-    try {
-        $resp = Invoke-MgGraphRequest -Method GET -Uri $Uri
-        return $resp.value
-    } catch {
-        Write-Warning "Failed to query assignments: $Uri : $($_.Exception.Message)"
-        return @()
+    $fid   = $Target.deviceAndAppManagementAssignmentFilterId
+    $ftype = $Target.deviceAndAppManagementAssignmentFilterType
+    if (-not $fid -or $fid -eq '00000000-0000-0000-0000-000000000000' -or -not $ftype -or $ftype -eq 'none') {
+        return $null
+    }
+    $name = if ($FilterLookup.ContainsKey($fid)) { $FilterLookup[$fid] } else { $fid }
+    return "$name ($ftype)"
+}
+
+function Get-GlobalAssignmentInfo {
+    param(
+        $Assignments,
+        [hashtable]$FilterLookup
+    )
+    $isAllDevices = $false; $isAllUsers = $false
+    $filters = New-Object System.Collections.Generic.HashSet[string]
+    $intents = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($a in $Assignments) {
+        $t = $a.target.'@odata.type'
+        $isGlobal = $false
+        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') { $isAllDevices = $true; $isGlobal = $true }
+        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') { $isAllUsers = $true; $isGlobal = $true }
+        if ($isGlobal) {
+            $f = Get-FilterDisplay -Target $a.target -FilterLookup $FilterLookup
+            if ($f) { [void]$filters.Add($f) }
+            if ($a.intent) { [void]$intents.Add([string]$a.intent) }
+        }
+    }
+    return [pscustomobject]@{
+        AllDevices = $isAllDevices
+        AllUsers   = $isAllUsers
+        Filter     = (($filters | Sort-Object) -join '; ')
+        Intent     = (($intents | Sort-Object) -join ',')
     }
 }
 
@@ -93,52 +140,40 @@ Ensure-GraphConnection
 
 $betaBase = 'https://graph.microsoft.com/beta'
 
-Write-Host 'Collecting configurationPolicies (settings catalog macOS)...' -ForegroundColor Cyan
-$configPolicies = Invoke-GraphAllPages -Uri "$betaBase/deviceManagement/configurationPolicies" | Where-Object { $_.platforms -match 'macOS' }
+Write-Host 'Collecting macOS objects (single batched request)...' -ForegroundColor Cyan
+$batch = Get-GraphBatchResults -Requests ([ordered]@{
+    filters    = '/deviceManagement/assignmentFilters?$top=100'
+    config     = '/deviceManagement/configurationPolicies?$top=100&$expand=assignments'
+    devcfg     = '/deviceManagement/deviceConfigurations?$top=100&$expand=assignments'
+    compliance = '/deviceManagement/deviceCompliancePolicies?$top=100&$expand=assignments'
+    shell      = '/deviceManagement/deviceShellScripts?$top=100&$expand=assignments'
+    customattr = '/deviceManagement/deviceCustomAttributeShellScripts?$top=100&$expand=assignments'
+    apps       = '/deviceAppManagement/mobileApps?$top=100&$expand=assignments'
+})
 
-Write-Host 'Collecting classic deviceConfigurations (macOS types)...' -ForegroundColor Cyan
-$deviceConfigs = Invoke-GraphAllPages -Uri "$betaBase/deviceManagement/deviceConfigurations" | Where-Object { $_.'@odata.type' -like '#microsoft.graph.macOS*' }
+$filterLookup = @{}
+foreach ($f in $batch['filters']) { if ($f.id) { $filterLookup[$f.id] = $f.displayName } }
 
-Write-Host 'Collecting deviceCompliancePolicies (macOS)...' -ForegroundColor Cyan
-$compliancePolicies = Invoke-GraphAllPages -Uri "$betaBase/deviceManagement/deviceCompliancePolicies" | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.macOSCompliancePolicy' }
-
-Write-Host 'Collecting deviceShellScripts (macOS shell scripts)...' -ForegroundColor Cyan
-# /assignments sub-endpoint 400s on some tenants — prefer $expand=assignments on the list.
-try {
-    $shellScriptsResponse = Invoke-MgGraphRequest -Method GET -Uri "$betaBase/deviceManagement/deviceShellScripts?`$top=999&`$expand=assignments"
-    $deviceShellScripts = $shellScriptsResponse.value
-} catch {
-    Write-Warning "Failed expanded retrieval of deviceShellScripts: $($_.Exception.Message). Falling back to basic list (assignments may be incomplete)."
-    $deviceShellScripts = Invoke-GraphAllPages -Uri "$betaBase/deviceManagement/deviceShellScripts"
-}
-
-Write-Host 'Collecting deviceCustomAttributeShellScripts (macOS)...' -ForegroundColor Cyan
-# Same /assignments quirk as deviceShellScripts — use $expand.
-try {
-    $customAttrResponse = Invoke-MgGraphRequest -Method GET -Uri "$betaBase/deviceManagement/deviceCustomAttributeShellScripts?`$top=999&`$expand=assignments"
-    $customAttrScripts = $customAttrResponse.value
-} catch {
-    Write-Warning "Failed expanded retrieval of deviceCustomAttributeShellScripts: $($_.Exception.Message). Falling back to basic list (assignments may be incomplete)."
-    $customAttrScripts = Invoke-GraphAllPages -Uri "$betaBase/deviceManagement/deviceCustomAttributeShellScripts"
-}
-
-Write-Host 'Collecting macOS mobileApps (all macOS app types)...' -ForegroundColor Cyan
-$mobileApps = Invoke-GraphAllPages -Uri "$betaBase/deviceAppManagement/mobileApps" | Where-Object { $_.'@odata.type' -like '#microsoft.graph.macOS*' }
+$configPolicies     = $batch['config']     | Where-Object { $_.platforms -match 'macOS' }
+$deviceConfigs      = $batch['devcfg']     | Where-Object { $_.'@odata.type' -like '#microsoft.graph.macOS*' }
+$compliancePolicies = $batch['compliance'] | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.macOSCompliancePolicy' }
+$deviceShellScripts = $batch['shell']
+$customAttrScripts  = $batch['customattr']
+$mobileApps         = $batch['apps']       | Where-Object { $_.'@odata.type' -like '#microsoft.graph.macOS*' }
 
 $rows = @()
 
 # Settings catalog policies assignments
 foreach ($p in $configPolicies) {
-    $assignments = Get-AssignmentsForObject -Uri "$betaBase/deviceManagement/configurationPolicies/$($p.id)/assignments"
-    $isAllDevices = $assignments.target.'@odata.type' -contains '#microsoft.graph.allDevicesAssignmentTarget'
-    $isAllUsers   = $assignments.target.'@odata.type' -contains '#microsoft.graph.allLicensedUsersAssignmentTarget'
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $p.assignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type        = 'SettingsCatalogPolicy'
             Name        = $p.name
             Id          = $p.id
-            AllDevices  = $isAllDevices
-            AllUsers    = $isAllUsers
+            AllDevices  = $info.AllDevices
+            AllUsers    = $info.AllUsers
+            Filter      = $info.Filter
             Intent      = ''
             Platforms   = ($p.platforms -join ',')
         }
@@ -147,20 +182,15 @@ foreach ($p in $configPolicies) {
 
 # Classic / custom device configurations
 foreach ($c in $deviceConfigs) {
-    $assignments = Get-AssignmentsForObject -Uri "$betaBase/deviceManagement/deviceConfigurations/$($c.id)/assignments"
-    $isAllDevices = $false; $isAllUsers = $false
-    foreach ($a in $assignments) {
-        $t = $a.target.'@odata.type'
-        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') { $isAllDevices = $true }
-        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') { $isAllUsers = $true }
-    }
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $c.assignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type       = 'DeviceConfiguration'
             Name       = $c.displayName
             Id         = $c.id
-            AllDevices = $isAllDevices
-            AllUsers   = $isAllUsers
+            AllDevices = $info.AllDevices
+            AllUsers   = $info.AllUsers
+            Filter     = $info.Filter
             Intent     = ''
             Platforms  = 'macOS'
         }
@@ -169,20 +199,15 @@ foreach ($c in $deviceConfigs) {
 
 # Compliance policies
 foreach ($cp in $compliancePolicies) {
-    $assignments = Get-AssignmentsForObject -Uri "$betaBase/deviceManagement/deviceCompliancePolicies/$($cp.id)/assignments"
-    $isAllDevices = $false; $isAllUsers = $false
-    foreach ($a in $assignments) {
-        $t = $a.target.'@odata.type'
-        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') { $isAllDevices = $true }
-        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') { $isAllUsers = $true }
-    }
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $cp.assignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type       = 'CompliancePolicy'
             Name       = $cp.displayName
             Id         = $cp.id
-            AllDevices = $isAllDevices
-            AllUsers   = $isAllUsers
+            AllDevices = $info.AllDevices
+            AllUsers   = $info.AllUsers
+            Filter     = $info.Filter
             Intent     = ''
             Platforms  = 'macOS'
         }
@@ -197,19 +222,15 @@ foreach ($s in $deviceShellScripts) {
         try { (Invoke-MgGraphRequest -Method GET -Uri "$betaBase/deviceManagement/deviceShellScripts/$($s.id)/assignments").value }
         catch { @() }
     }
-    $isAllDevices = $false; $isAllUsers = $false
-    foreach ($a in $expandedAssignments) {
-        $t = $a.target.'@odata.type'
-        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') { $isAllDevices = $true }
-        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') { $isAllUsers = $true }
-    }
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $expandedAssignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type       = 'ShellScript'
             Name       = $s.displayName
             Id         = $s.id
-            AllDevices = $isAllDevices
-            AllUsers   = $isAllUsers
+            AllDevices = $info.AllDevices
+            AllUsers   = $info.AllUsers
+            Filter     = $info.Filter
             Intent     = ''
             Platforms  = 'macOS'
         }
@@ -222,19 +243,15 @@ foreach ($ca in $customAttrScripts) {
         try { (Invoke-MgGraphRequest -Method GET -Uri "$betaBase/deviceManagement/deviceCustomAttributeShellScripts/$($ca.id)/assignments").value }
         catch { @() }
     }
-    $isAllDevices = $false; $isAllUsers = $false
-    foreach ($a in $expandedAssignments) {
-        $t = $a.target.'@odata.type'
-        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') { $isAllDevices = $true }
-        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') { $isAllUsers = $true }
-    }
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $expandedAssignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type       = 'CustomAttribute'
             Name       = $ca.displayName
             Id         = $ca.id
-            AllDevices = $isAllDevices
-            AllUsers   = $isAllUsers
+            AllDevices = $info.AllDevices
+            AllUsers   = $info.AllUsers
+            Filter     = $info.Filter
             Intent     = ''
             Platforms  = 'macOS'
         }
@@ -243,28 +260,16 @@ foreach ($ca in $customAttrScripts) {
 
 # macOS Apps
 foreach ($app in $mobileApps) {
-    $assignments = Get-AssignmentsForObject -Uri "$betaBase/deviceAppManagement/mobileApps/$($app.id)/assignments"
-    $isAllDevices = $false; $isAllUsers = $false
-    $intents = New-Object System.Collections.Generic.HashSet[string]
-    foreach ($a in $assignments) {
-        $t = $a.target.'@odata.type'
-        if ($t -eq '#microsoft.graph.allDevicesAssignmentTarget') {
-            $isAllDevices = $true
-            if ($a.intent) { [void]$intents.Add([string]$a.intent) }
-        }
-        if ($t -eq '#microsoft.graph.allLicensedUsersAssignmentTarget') {
-            $isAllUsers = $true
-            if ($a.intent) { [void]$intents.Add([string]$a.intent) }
-        }
-    }
-    if ($isAllDevices -or $isAllUsers) {
+    $info = Get-GlobalAssignmentInfo -Assignments $app.assignments -FilterLookup $filterLookup
+    if ($info.AllDevices -or $info.AllUsers) {
         $rows += [pscustomobject]@{
             Type       = 'macOSApp'
             Name       = $app.displayName
             Id         = $app.id
-            AllDevices = $isAllDevices
-            AllUsers   = $isAllUsers
-            Intent     = (($intents | Sort-Object) -join ',')
+            AllDevices = $info.AllDevices
+            AllUsers   = $info.AllUsers
+            Filter     = $info.Filter
+            Intent     = $info.Intent
             Platforms  = 'macOS'
         }
     }
@@ -275,7 +280,24 @@ if (-not $rows) {
     return
 }
 
-$rows | Sort-Object Type, Name | Format-Table -AutoSize
+# Highlight global assignments that have NO assignment filter applied (red).
+# Format-Table is ANSI-aware in PowerShell 7.2+, so wrapping each cell value
+# keeps column widths correct.
+$esc = [char]27
+$red = "$esc[31m"
+$reset = "$esc[0m"
+$display = $rows | Sort-Object Type, Name | ForEach-Object {
+    if ([string]::IsNullOrWhiteSpace($_.Filter)) {
+        $colored = [ordered]@{}
+        foreach ($prop in $_.PSObject.Properties) {
+            $colored[$prop.Name] = "$red$($prop.Value)$reset"
+        }
+        [pscustomobject]$colored
+    } else {
+        $_
+    }
+}
+$display | Format-Table Type, Name, Id, AllDevices, AllUsers, Filter, Intent -AutoSize
 
 if ($CsvPath) {
     try {
