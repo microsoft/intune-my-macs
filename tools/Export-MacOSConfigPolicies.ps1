@@ -8,7 +8,7 @@
     - Classic deviceConfigurations whose @odata.type begins with macOS
     - Settings catalog configurationPolicies where platforms includes macOS
   Presents an indexed table, prompts for a selection (unless -NoPrompt or -SelectId used),
-  then exports the full object (with settings & relationships for catalog) to an output folder.
+  then exports the full object (with settings for catalog) to an output folder.
 
  .PARAMETER OutputFolder
   Destination folder for exported JSON (created if missing). Default: ./exports
@@ -137,7 +137,7 @@ Write-Info "Selected: $($selected.DisplayName) [$($selected.Source)/$($selected.
 if ($selected.Source -eq 'Classic') {
     $full = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations/$($selected.Id)"
 } else {
-    $full = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies/$($selected.Id)?`$expand=settings,relationships"
+    $full = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies/$($selected.Id)?`$expand=settings"
 }
 
 if (-not (Test-Path -LiteralPath $OutputFolder)) { New-Item -ItemType Directory -Path $OutputFolder -Force | Out-Null }
