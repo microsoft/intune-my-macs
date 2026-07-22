@@ -2,7 +2,7 @@
 
 ## Configuration Documentation
 
-**Generated:** July 13, 2026
+**Generated:** July 22, 2026
 
 **Total Artifacts:** 44
 
@@ -43,7 +43,7 @@ Click any reference ID to jump to detailed configuration.
 | [cfg-sec-002-screensaver-idle](#cfg-sec-002-screensaver-idle-customconfig) | CustomConfig | 1 |
 | [cfg-sys-100-wallpaper-pppc](#cfg-sys-100-wallpaper-pppc-customconfig) | CustomConfig | 1 |
 | [cmp-cmp-001-macos-baseline](#cmp-cmp-001-macos-baseline-compliance) | Compliance | 12 |
-| [pol-app-100-office](#pol-app-100-office-policy) | Policy | 21 |
+| [pol-app-100-office](#pol-app-100-office-policy) | Policy | 20 |
 | [pol-app-101-company-portal-pppc](#pol-app-101-company-portal-pppc-policy) | Policy | 4 |
 | [pol-app-101-edge-level1](#pol-app-101-edge-level1-policy) | Policy | 22 |
 | [pol-app-104-onedrive-fda-pppc](#pol-app-104-onedrive-fda-pppc-policy) | Policy | 5 |
@@ -223,10 +223,10 @@ Baseline compliance: FileVault required, Firewall enabled, SIP enabled, minimum 
 
 ### pol-app-100-office (Policy)
 
-Microsoft 365 for Mac settings catalog: update channel/deadlines, auto sign-in, diagnostic data level, Office activation email, OneDrive Files On-Demand and Known Folder Move silent opt-in, fonts, and the new Outlook experience. The OneDrive KFM tenant placeholder (REPLACE_WITH_TENANT_ID) is substituted with the connected Entra tenant ID at deploy time; the {{mail}} token in OfficeActivationEmailAddress is resolved per-user by Intune. The Outlook DefaultEmailAddressOrDomain key is intentionally omitted - {{mail}} does not expand for it in a settings-catalog policy. The OneDrive OpenAtLogin key is also omitted - deprecated since sync app 24.113 and a no-op on current builds; SCR-APP-108 enables the login item instead. AcknowledgedDataCollectionPolicy uses the numeric/choice form (1 = required data only) - MAU ignores the deprecated string form.
+Microsoft 365 for Mac settings catalog: update channel/deadlines, auto sign-in, diagnostic data level, Office activation email, OneDrive Files On-Demand and Known Folder Move silent opt-in, and the new Outlook experience. The OneDrive KFM tenant placeholder (REPLACE_WITH_TENANT_ID) is substituted with the connected Entra tenant ID at deploy time; the {{mail}} token in OfficeActivationEmailAddress is resolved per-user by Intune. The Outlook DefaultEmailAddressOrDomain key is intentionally omitted - {{mail}} does not expand for it in a settings-catalog policy. The OneDrive OpenAtLogin key is also omitted - deprecated since sync app 24.113 and a no-op on current builds; SCR-APP-108 enables the login item instead. AcknowledgedDataCollectionPolicy uses the numeric/choice form (1 = required data only) - MAU ignores the deprecated string form.
 
 **Source:** `macOS/configurations/office/pol-app-100-office.json`  
-**Settings:** 21
+**Settings:** 20
 
 | Key | Value |
 |-----|-------|
@@ -250,7 +250,6 @@ Microsoft 365 for Mac settings catalog: update channel/deadlines, auto sign-in, 
 | `com.apple.managedclient.preferences_kfmsilentoptindocuments` | `True` |
 | `com.apple.managedclient.preferences_enablenewoutlook` | `3` |
 | `com.apple.managedclient.preferences_userpreference_maxchecklistdisplaydurationmet` | `True` |
-| `com.apple.font_font` | `f015db7e-61f8-4882-8469-1b77f4efbb2c` |
 
 
 ### pol-app-101-company-portal-pppc (Policy)

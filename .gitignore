@@ -5,9 +5,7 @@ configurations/.DS_Store
 # MDE onboarding files (contain sensitive tenant-specific configuration).
 # Bare filenames so they stay ignored wherever they land (macOS/mde/, or a
 # stale root copy left over from the macOS/ restructure).
-cfg-mde-001-onboarding.json
 cfg-mde-001-onboarding.mobileconfig
-cfg-mde-001-onboarding.xml
 
 
 # Local OSS compliance audit reports — not for check-in
