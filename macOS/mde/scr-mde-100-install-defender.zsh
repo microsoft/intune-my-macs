@@ -44,6 +44,7 @@ waitForTheseApps=( \
 
 # Generated variables
 tempdir=$(mktemp -d)
+pkg="$tempdir/MicrosoftDefender.pkg"                                                  # Fixed local download path
 log="$logandmetadir/$appname.log"                                                     # Log file
 metafile="$logandmetadir/$appname.meta"                                               # Stores last-modified date
 
@@ -98,20 +99,20 @@ fetchLastModifiedDate () {
 
 downloadApp () {
   echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Downloading [$appname] from [$weburl]"
-  cd "$tempdir" || { echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Failed to cd to temp dir"; exit 1; }
-  curl -f -s --connect-timeout 30 --retry 5 --retry-delay 60 -L -J -O "$weburl"
-  if [[ $? -ne 0 ]]; then
+  # Download to a fixed local path; the remote filename returned by the FWLink
+  # (e.g. wdav.pkg) does not affect success.
+  if ! curl -fSL --connect-timeout 30 --retry 3 --retry-delay 10 -o "$pkg" "$weburl"; then
     echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Download failed"
     updateOctory failed
     exit 1
   fi
-  # Identify downloaded file
-  for f in *; do tempfile="$PWD/$f"; done
-  case $tempfile in
-    *.pkg|*.PKG) packageType="PKG" ;;
-    *) echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Unexpected file type: $tempfile"; exit 1 ;;
-  esac
-  echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Downloaded to [$tempfile] (type=$packageType)"
+  # Sanity check: the download must be a PKG installer (xar archive)
+  if [[ "$(file -b "$pkg")" != *"xar archive"* ]]; then
+    echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Downloaded file is not a PKG installer. Aborting."
+    updateOctory failed
+    exit 1
+  fi
+  echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Downloaded to [$pkg]"
 }
 
 updateCheck () {
@@ -175,7 +176,7 @@ installPKG () {
   echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Installing [$appname]"
   updateOctory installing
   # Defender PKG expects root target
-  installer -pkg "$tempfile" -target /
+  installer -pkg "$pkg" -target /
   if [[ $? -eq 0 ]]; then
     echo "$(date -u "+%Y-%m-%d %H:%M:%S UTC") | Install complete"
     fetchLastModifiedDate update
