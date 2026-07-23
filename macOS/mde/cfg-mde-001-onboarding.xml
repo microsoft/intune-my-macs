@@ -1,0 +1,11 @@
+<IntuneManifest>
+  <ReferenceId>CFG-MDE-001</ReferenceId>
+  <Version>1.0</Version>
+  <Type>CustomConfig</Type>
+  <Name>CFG-MDE-001 - Microsoft Defender for Endpoint Onboarding</Name>
+  <Description>Microsoft Defender for Endpoint (MDE) onboarding configuration profile for macOS. Delivers the tenant-specific WDATP onboarding blob (OrgId and signed OnboardingInfo) that registers the device with the organization's Microsoft Defender service. This file is unique per tenant and must be downloaded from the Microsoft Defender portal.</Description>
+  <Platform>macOS</Platform>
+  <Category>Security</Category>
+  <SourceFile>mde/cfg-mde-001-onboarding.mobileconfig</SourceFile>
+  <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations</CreateGraphUri>
+</IntuneManifest>

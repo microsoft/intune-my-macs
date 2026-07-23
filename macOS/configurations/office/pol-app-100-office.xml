@@ -1,12 +1,12 @@
 <IntuneManifest>
   <ReferenceId>POL-APP-100</ReferenceId>
-  <Version>2.1</Version>
+  <Version>2.2</Version>
   <Type>Policy</Type>
   <Name>POL-APP-100 - Microsoft Office Configuration</Name>
-  <Description>Microsoft 365 for Mac settings catalog: update channel/deadlines, auto sign-in, diagnostic data level, Office activation email, OneDrive Files On-Demand and Known Folder Move silent opt-in, fonts, and the new Outlook experience. The OneDrive KFM tenant placeholder (REPLACE_WITH_TENANT_ID) is substituted with the connected Entra tenant ID at deploy time; the {{mail}} token in OfficeActivationEmailAddress is resolved per-user by Intune. The Outlook DefaultEmailAddressOrDomain key is intentionally omitted - {{mail}} does not expand for it in a settings-catalog policy. The OneDrive OpenAtLogin key is also omitted - deprecated since sync app 24.113 and a no-op on current builds; SCR-APP-108 enables the login item instead. AcknowledgedDataCollectionPolicy uses the numeric/choice form (1 = required data only) - MAU ignores the deprecated string form.</Description>
+  <Description>Microsoft 365 for Mac settings catalog: update channel/deadlines, auto sign-in, diagnostic data level, Office activation email, OneDrive Files On-Demand and Known Folder Move silent opt-in, and the new Outlook experience. The OneDrive KFM tenant placeholder (REPLACE_WITH_TENANT_ID) is substituted with the connected Entra tenant ID at deploy time; the {{mail}} token in OfficeActivationEmailAddress is resolved per-user by Intune. The Outlook DefaultEmailAddressOrDomain key is intentionally omitted - {{mail}} does not expand for it in a settings-catalog policy. The OneDrive OpenAtLogin key is also omitted - deprecated since sync app 24.113 and a no-op on current builds; SCR-APP-108 enables the login item instead. AcknowledgedDataCollectionPolicy uses the numeric/choice form (1 = required data only) - MAU ignores the deprecated string form.</Description>
   <Platform>macOS</Platform>
   <Category>Office</Category>
   <SourceFile>configurations/office/pol-app-100-office.json</SourceFile>
     <CreateGraphUri>https://graph.microsoft.com/beta/deviceManagement/configurationPolicies</CreateGraphUri>
-<SettingsCount>21</SettingsCount>
+<SettingsCount>20</SettingsCount>
 </IntuneManifest>

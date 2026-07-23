@@ -103,7 +103,6 @@ When a policy is exported, the script:
 2. Generates a filename: `{PolicyName}-{Timestamp}-{Id}.json`
 3. Saves the complete policy object including:
    - All configuration settings
-   - Relationships (for Settings Catalog)
    - Metadata
 
 Example output file: `FileVault_Policy-20240115-143022-abc12345-6789-0123-4567-890abcdef012.json`
@@ -176,4 +175,4 @@ Export policies to JSON before migrating to a new tenant or making significant c
 
 - This is a **read-only** operation; no changes are made to your Intune environment
 - Uses the Microsoft Graph **beta** endpoint for full macOS policy support
-- Settings Catalog exports include the `settings` and `relationships` expansion for complete data
+- Settings Catalog exports include the `settings` expansion for complete data
