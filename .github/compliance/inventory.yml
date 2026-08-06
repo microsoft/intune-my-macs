@@ -1,0 +1,6 @@
+inventory:
+  - source: DirectOwners
+    items:
+      - id: ckunze@microsoft.com
+      - id: cbrito@microsoft.com
+isProduction: false
